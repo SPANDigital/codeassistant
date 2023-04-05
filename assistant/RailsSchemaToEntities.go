@@ -9,8 +9,7 @@ import (
 func (a ChatGPTBasedCodeAssistant) RailsSchemaToEntities(railsSchema string) []Code {
 	var re = regexp.MustCompile(`(?sU)create_table "(\w+)".+end`)
 	var codex []Code
-	for i, match := range re.FindAllStringSubmatch(railsSchema, -1) {
-		fmt.Println(match[0], "found at index", i)
+	for _, match := range re.FindAllStringSubmatch(railsSchema, -1) {
 
 		prompt := fmt.Sprintf("convert ruby on rails create_table to a NestJS entity: \"%s\"", match)
 
