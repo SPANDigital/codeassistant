@@ -32,7 +32,7 @@ func (c *ChatGPTHttpClient) Completion(prompt string) string {
 	// Create the request body
 	request := model.ChatGPTRequest{
 		Prompt: prompt,
-		Model:  "gpt-3.5-turbo",
+		Model:  "gpt-3.5-turbo-0301",
 	}
 	requestBytes, err := json.Marshal(request)
 	if err != nil {

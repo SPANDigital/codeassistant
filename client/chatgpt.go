@@ -1,5 +1,5 @@
 package client
 
 type ChatGPT interface {
-	completion(prompt string) string
+	Completion(prompt string) string
 }

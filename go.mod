@@ -6,6 +6,7 @@ require (
 	github.com/jpfielding/gowirelog v0.0.0-20211207135852-215e6dc55529
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.15.0
+	github.com/stoewer/go-strcase v1.3.0
 )
 
 require (
