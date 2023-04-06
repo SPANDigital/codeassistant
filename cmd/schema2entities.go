@@ -16,6 +16,7 @@ import (
 
 var schemaFilename string
 var entitiesDirectory string
+var servicesDirectory string
 
 // schema2entitiesCmd represents the schema2entities command
 var schema2entitiesCmd = &cobra.Command{
@@ -41,13 +42,19 @@ to quickly create a Cobra application.`,
 		chatGPT := client.New(chatGptApiKey, rate.NewLimiter(rate.Every(60*time.Second), 20))
 		codeAssistant := assistant.New(chatGPT)
 
-		codeAssistant.RailsSchemaToEntities(railsSchema, func(code model.SourceCode) model.SourceCode {
-			println("Language:", code.Language)
+		codeAssistant.RailsSchemaToEntities(railsSchema, model.SourceCodeHandlers(func(code model.SourceCode) model.SourceCode {
+			println("Entity Language:", code.Language)
 			if code.Language == "typescript" && code.Content != "" {
 				code.Save(entitiesDirectory)
 			}
 			return code
-		})
+		}), model.SourceCodeHandlers(func(code model.SourceCode) model.SourceCode {
+			println("Activity Language:", code.Language)
+			if code.Language == "typescript" && code.Content != "" {
+				code.Save(servicesDirectory)
+			}
+			return code
+		}))
 	},
 }
 
@@ -65,4 +72,5 @@ func init() {
 	// schema2entitiesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	schema2entitiesCmd.Flags().StringVar(&schemaFilename, "schemaFilename", "", "schema file name")
 	schema2entitiesCmd.Flags().StringVar(&entitiesDirectory, "entitiesDirectory", "", "entities directory")
+	schema2entitiesCmd.Flags().StringVar(&servicesDirectory, "servicesDirectory", "", "services directory")
 }

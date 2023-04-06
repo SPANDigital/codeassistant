@@ -37,7 +37,8 @@ func (c *ChatGPTHttpClient) Completion(messages ...model.Message) ([]model2.Choi
 	// Create the request body
 	request := model2.ChatGPTRequest{
 		Messages: messages,
-		Model:    "gpt-3.5-turbo-0301",
+		Model:    "gpt-3.5-turbo",
+		User:     "richard.wooding@spandigital.com",
 	}
 	requestBytes, err := json.Marshal(request)
 	if err != nil {
