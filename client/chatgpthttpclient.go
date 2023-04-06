@@ -4,35 +4,40 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/jpfielding/gowirelog/wirelog"
+	model2 "github.com/spandigitial/codeassistant/client/model"
 	"github.com/spandigitial/codeassistant/model"
+	"github.com/spandigitial/codeassistant/ratelimit"
+	"golang.org/x/time/rate"
 	"io"
 	"net/http"
-	"os"
 )
 
 type ChatGPTHttpClient struct {
-	client *http.Client
+	client *ratelimit.RLHTTPClient
 	apiKey string
 }
 
-func New(apiKey string) *ChatGPTHttpClient {
+func New(apiKey string, ratelimiter *rate.Limiter) *ChatGPTHttpClient {
 	transport := wirelog.NewHTTPTransport()
-	wirelog.LogToWriter(transport, os.Stdout, true, true)
+	wirelog.LogToFile(transport, "/tmp/http.log", true, true)
 	return &ChatGPTHttpClient{
 		apiKey: apiKey,
-		client: &http.Client{
-			Transport: transport,
+		client: &ratelimit.RLHTTPClient{
+			Client: &http.Client{
+				Transport: transport,
+			},
+			Ratelimiter: ratelimiter,
 		},
 	}
 }
 
-func (c *ChatGPTHttpClient) Completion(prompt string) string {
+func (c *ChatGPTHttpClient) Completion(messages ...model.Message) ([]model2.Choice, error) {
 	url := "https://api.openai.com/v1/chat/completions"
 
 	// Create the request body
-	request := model.ChatGPTRequest{
-		Prompt: prompt,
-		Model:  "gpt-3.5-turbo-0301",
+	request := model2.ChatGPTRequest{
+		Messages: messages,
+		Model:    "gpt-3.5-turbo-0301",
 	}
 	requestBytes, err := json.Marshal(request)
 	if err != nil {
@@ -51,22 +56,22 @@ func (c *ChatGPTHttpClient) Completion(prompt string) string {
 	// Send the HTTP request]
 	resp, err := c.client.Do(req)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	// Read the response body
 	responseBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	// Parse the response JSON
-	var response model.ChatGPTResponse
+	var response model2.ChatGPTResponse
 	err = json.Unmarshal(responseBytes, &response)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	return response.Completion
+	return response.Choices, nil
 }
