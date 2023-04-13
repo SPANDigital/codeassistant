@@ -7,3 +7,7 @@ type Choice struct {
 	FinishReason string        `json:"finish_reason"`
 	Index        int           `json:"index"`
 }
+
+func (c Choice) String() string {
+	return c.Message.Content
+}

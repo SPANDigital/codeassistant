@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/spandigitial/codeassistant/model"
 	"regexp"
+	"strings"
 )
 
 var createTableRe = regexp.MustCompile(`(?sU)create_table "(\w+)".+end`)
@@ -26,28 +27,27 @@ func (a ChatGPTBasedCodeAssistant) RailsSchemaToEntities(railsSchema string, ent
 
 		var className string
 		choices, err := a.chatGPT.Completion(messages...)
+
+		if err != nil {
+			println("Error:", err)
+		}
+
 		if err == nil {
-			for _, choice := range choices {
-				for _, codeBlock := range choice.Message.FencedCodeBlocks() {
-					code := codeBlock.ToSourceCode(
-						func(block model.FencedCodeBlock) string {
-							classNameMatch := extractClassNameRe.FindStringSubmatch(block.Content)
-							if len(classNameMatch) > 0 {
-								className = classNameMatch[1]
-							} else {
-								println("Cannot extractive classname for match:", match[1])
-								className = match[1]
-							}
-							return fmt.Sprintf("%s.entity", className)
-						},
-					)
-					for _, handler := range entityHandlers {
-						code = handler(code)
-					}
+
+			handleCodeBlockFromChoices(choices, func(block model.FencedCodeBlock) string {
+				classNameMatch := extractClassNameRe.FindStringSubmatch(block.Content)
+				if len(classNameMatch) > 0 {
+					className = classNameMatch[1]
+				} else {
+					println("Cannot extractive classname for match:", match[1])
+					className = match[1]
 				}
-			}
+				return fmt.Sprintf("%s.entity.ts", match[1])
+			}, entityHandlers)
 
 			serviceName := fmt.Sprintf("%sService", className)
+
+			classNameLower := strings.ToLower(className)
 
 			messages = []model.Message{
 				{
@@ -56,22 +56,18 @@ func (a ChatGPTBasedCodeAssistant) RailsSchemaToEntities(railsSchema string, ent
 				},
 				{
 					Role:    "user",
-					Content: fmt.Sprintf("Assuming %s entity already exists. Create a NestJs service `%s` that implements the `findAll()`, `findOne(id: number)`, `create(announcement: Announcement)`, `update(id: number, announcement: Announcement)`, and `delete(id: number)`. Format all code examples in Markdown. No javascript examples. Do not returns code snippegts, return full typescript classes only.", className, serviceName),
+					Content: fmt.Sprintf("Assuming %s entity already exists. Create a NestJs service `%s` that implements the `findAll()`, `findOne(id: number)`, `create(%s: %s)`, `update(id: number, %s: %s)`, and `delete(id: number), the service should make use of a Repository`.", className, serviceName, classNameLower, className, classNameLower, className),
 				},
 			}
 
 			choices, err = a.chatGPT.Completion(messages...)
+			if err != nil {
+				println("Error:", err)
+			}
 			if err == nil {
-				for _, choice := range choices {
-					for _, codeBlock := range choice.Message.FencedCodeBlocks() {
-						code := codeBlock.ToSourceCode(func(block model.FencedCodeBlock) string {
-							return serviceName
-						})
-						for _, handler := range serviceHandlers {
-							code = handler(code)
-						}
-					}
-				}
+				handleCodeBlockFromChoices(choices, func(block model.FencedCodeBlock) string {
+					return match[1] + ".service.ts"
+				}, serviceHandlers)
 			}
 
 		}

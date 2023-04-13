@@ -12,3 +12,7 @@ func (b FencedCodeBlock) ToSourceCode(filenameGenerator func(block FencedCodeBlo
 		Content:  b.Content,
 	}
 }
+
+func (b FencedCodeBlock) String() string {
+	return b.Content
+}
