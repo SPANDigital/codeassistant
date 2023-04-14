@@ -21,7 +21,7 @@ func (a ChatGPTBasedCodeAssistant) RailsSchemaToEntities(railsSchema string, ent
 			},
 			{
 				Role:    "user",
-				Content: fmt.Sprintf("Convert ruby on rails create_table to a NestJS entity: \"%s\".", match),
+				Content: fmt.Sprintf("Convert ruby on rails create_table to a NestJS entity: ```%s```.", match),
 			},
 		}
 

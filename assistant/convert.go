@@ -21,7 +21,7 @@ func (a ChatGPTBasedCodeAssistant) Convert(rubyCode io.Reader, rubyType string, 
 		},
 		{
 			Role:    "user",
-			Content: fmt.Sprintf("Convert ruby on rails %s to NestJS %s: \"%s\".", rubyType, nestJsType, rubyCodeValue),
+			Content: fmt.Sprintf("Convert ruby on rails %s to NestJS %s: ```%s```.", rubyType, nestJsType, rubyCodeValue),
 		},
 	}
 
