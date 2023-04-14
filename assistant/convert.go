@@ -17,7 +17,7 @@ func (a ChatGPTBasedCodeAssistant) Convert(rubyCode io.Reader, rubyType string, 
 	messages := []model.Message{
 		{
 			Role:    "system",
-			Content: "You are a typescript code generating bot. Format all output in markdown. For every question answer with one block of code which is a class in typescript. Do not return code snippets.",
+			Content: "You are a typescript code generating bot. Format all output in markdown. For every question answer with one block of code which is a class in typescript. Do not return code snippets. Explain assumptions in comments.",
 		},
 		{
 			Role:    "user",

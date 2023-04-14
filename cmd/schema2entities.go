@@ -43,13 +43,11 @@ to quickly create a Cobra application.`,
 		codeAssistant := assistant.New(chatGPT)
 
 		codeAssistant.RailsSchemaToEntities(railsSchema, model.SourceCodeHandlers(func(code model.SourceCode) model.SourceCode {
-			println("Entity Language:", code.Language)
 			if code.Language == "typescript" && code.Content != "" {
 				code.Save(entitiesDirectory)
 			}
 			return code
 		}), model.SourceCodeHandlers(func(code model.SourceCode) model.SourceCode {
-			println("Activity Language:", code.Language)
 			if code.Language == "typescript" && code.Content != "" {
 				code.Save(servicesDirectory)
 			}

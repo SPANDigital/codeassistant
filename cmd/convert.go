@@ -4,7 +4,6 @@ Copyright © 2023 richard.wooding@spandigital.com
 package cmd
 
 import (
-	"fmt"
 	"github.com/spandigitial/codeassistant/assistant"
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/model"
@@ -33,7 +32,6 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("convert called")
 
 		chatGPT := client.New(chatGptApiKey, rate.NewLimiter(rate.Every(60*time.Second), 20))
 		codeAssistant := assistant.New(chatGPT)
@@ -44,8 +42,6 @@ to quickly create a Cobra application.`,
 		}
 
 		absDest, _ := filepath.Abs(dest)
-
-		println("Abs dest is ", absDest)
 
 		return codeAssistant.Convert(reader, railsType, nestJsType, absDest, model.SourceCodeHandlers(func(code model.SourceCode) model.SourceCode {
 			code.Save(path.Dir(absDest))

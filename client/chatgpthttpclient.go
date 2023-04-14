@@ -3,7 +3,6 @@ package client
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/jpfielding/gowirelog/wirelog"
 	model2 "github.com/spandigitial/codeassistant/client/model"
 	"github.com/spandigitial/codeassistant/model"
 	"github.com/spandigitial/codeassistant/ratelimit"
@@ -13,21 +12,38 @@ import (
 )
 
 type ChatGPTHttpClient struct {
-	client *ratelimit.RLHTTPClient
-	apiKey string
+	apiKey       string
+	rateLimiter  *rate.Limiter
+	httpClient   *http.Client
+	rlHTTPClient *ratelimit.RLHTTPClient
 }
 
-func New(apiKey string, ratelimiter *rate.Limiter) *ChatGPTHttpClient {
-	transport := wirelog.NewHTTPTransport()
-	wirelog.LogToFile(transport, "/tmp/http.log", true, true)
-	return &ChatGPTHttpClient{
-		apiKey: apiKey,
-		client: &ratelimit.RLHTTPClient{
-			Client: &http.Client{
-				Transport: transport,
-			},
-			Ratelimiter: ratelimiter,
-		},
+type Option func(client *ChatGPTHttpClient)
+
+func New(apiKey string, rateLimiter *rate.Limiter, options ...Option) *ChatGPTHttpClient {
+	c := &ChatGPTHttpClient{
+		apiKey:      apiKey,
+		rateLimiter: rateLimiter,
+	}
+
+	for _, option := range options {
+		option(c)
+	}
+
+	if c.httpClient == nil {
+		c.httpClient = http.DefaultClient
+	}
+
+	c.rlHTTPClient = &ratelimit.RLHTTPClient{
+		Client:      c.httpClient,
+		Ratelimiter: c.rateLimiter,
+	}
+	return c
+}
+
+func WithHttpClient(httpClient *http.Client) Option {
+	return func(client *ChatGPTHttpClient) {
+		client.httpClient = httpClient
 	}
 }
 
@@ -55,7 +71,7 @@ func (c *ChatGPTHttpClient) Completion(messages ...model.Message) ([]model2.Choi
 	req.Header.Set("Authorization", "Bearer "+c.apiKey)
 
 	// Send the HTTP request]
-	resp, err := c.client.Do(req)
+	resp, err := c.rlHTTPClient.Do(req)
 	if err != nil {
 		return nil, err
 	}

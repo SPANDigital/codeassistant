@@ -12,7 +12,6 @@ type SourceCode struct {
 }
 
 func (c SourceCode) Save(directory string) error {
-	println("Saving ", c.Filename, "in", directory)
 	return os.WriteFile(filepath.Join(directory, c.Filename), []byte(c.Content), 0644)
 }
 
