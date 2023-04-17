@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.15.0
-	github.com/yuin/goldmark v1.2.1
+	github.com/yuin/goldmark v1.5.4
 	golang.org/x/time v0.3.0
 )
 
