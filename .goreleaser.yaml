@@ -123,7 +123,7 @@ brews:
 
     # Allows you to add a custom require_relative at the top of the formula
     # template.
-    #custom_require: custom_download_strategy
+    custom_require: lib/private.rb
 
     # Git author used to commit to the repository.
     commit_author:
