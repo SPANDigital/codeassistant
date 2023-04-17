@@ -50,9 +50,9 @@ brews:
 
     # IDs of the archives to use.
     # Empty means all IDs.
-    ids:
-      - foo
-      - bar
+    # ids:
+    #  - foo
+    #  - bar
 
     # GOARM to specify which 32-bit arm version to use if there are multiple
     # versions from the build section. Brew formulas support only one 32-bit
@@ -89,7 +89,7 @@ brews:
       # Default: default repository branch.
       #
       # Templates: allowed
-      branch: main
+      #branch: main
 
       # Optionally a token can be provided, if it differs from the token
       # provided to GoReleaser
@@ -107,7 +107,7 @@ brews:
         # Base branch of the PR.
         #
         # Default: default repository branch.
-        base: main
+        #base: main
 
     # URL which is determined by the given Token (github, gitlab or gitea).
     #
@@ -180,39 +180,39 @@ brews:
 
 
     # Packages that conflict with your package.
-    conflicts:
-      - svn
-      - bash
+    # conflicts:
+    #  - svn
+    #  - bash
 
     # Specify for packages that run as a service.
-    plist: |
-      <?xml version="1.0" encoding="UTF-8"?>
-      # ...
+    #plist: |
+    #  <?xml version="1.0" encoding="UTF-8"?>
+    #  # ...
 
     # Service block.
     #
     # Since: v1.7
-    service: |
-      run: foo/bar
-      # ...
+    #service: |
+    #  run: foo/bar
+    #  # ...
 
     # So you can `brew test` your formula.
-    test: |
-      system "#{bin}/foo --version"
-      # ...
+    #test: |
+    #  system "#{bin}/foo --version"
+    #  # ...
 
     # Custom install script for brew.
     # Default: 'bin.install "BinaryName"'
-    install: |
-      bin.install "some_other_name"
-      bash_completion.install "completions/foo.bash" => "foo"
-      # ...
+    # install: |
+    #  bin.install "some_other_name"
+    #  bash_completion.install "completions/foo.bash" => "foo"
+    #  # ...
 
     # Custom post_install script for brew.
     # Could be used to do any additional work after the "install" script
-    post_install: |
-      etc.install "app-config.conf"
-      ...
+    # post_install: |
+    #  etc.install "app-config.conf"
+    #  ...
 
         
 
