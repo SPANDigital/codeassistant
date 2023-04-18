@@ -14,7 +14,7 @@ func (a ChatGPTBasedCodeAssistant) WhatIs(term string, handlers ...func(markdown
 		},
 		{
 			Role:    "user",
-			Content: fmt.Sprintf("What is term %s?", term),
+			Content: fmt.Sprintf("What is %s?", term),
 		},
 	}
 
