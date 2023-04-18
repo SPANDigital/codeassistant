@@ -10,7 +10,7 @@ func (a ChatGPTBasedCodeAssistant) WhatIs(term string, handlers ...func(markdown
 	messages := []model.Message{
 		{
 			Role:    "system",
-			Content: "Send all responses in Markdown. Favour longer responses.",
+			Content: "Send all responses in Markdown. Favour longer responses with multiple paragraphs and bullet points.",
 		},
 		{
 			Role:    "user",
