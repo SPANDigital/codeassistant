@@ -35,3 +35,29 @@ homebrew install codeassistant
 - RubyMine
 
 - WebStorm
+
+## Commands
+
+### Retrieve definition of something markdown
+
+```bash
+codeassistant whatis <term>
+```
+
+### Generate NestJS entities and basic services from a Ruby on Rails Schema
+
+```bash
+codeassistant rails2nestjs schema2entities --schemaFilename <pathToRubyOnRailsSchema> --entitiesDirectory <directoryToSaveEntities> --servicesDirectory <directoryToSaveServices> 
+```
+
+### Convert Ruby on Rails Controllers to NestJS Controllers
+
+```bash
+codeassistant rails2nestjs convert --railstype controller --nestjstype controller --src <sourceToRubyFile> --dest <destinationTypeScript>
+```
+
+### Convert Ruby on Rails RSpec to NestJS Tests using Jest
+
+```bash
+codeassistant rails2nestjs convert --railstype spec --nestjstype "test using jest" --src <sourceToRubyFile> --dest <destinationTypeScript>
+```
