@@ -41,7 +41,8 @@ to quickly create a Cobra application.`,
 		railsSchema := string(data)
 
 		openAiApiKey := viper.GetString("openAiApiKey")
-		chatGPT := client.New(openAiApiKey, rate.NewLimiter(rate.Every(60*time.Second), 20))
+		user := viper.GetString("userEmail")
+		chatGPT := client.New(openAiApiKey, rate.NewLimiter(rate.Every(60*time.Second), 20), client.WithUser(user))
 		codeAssistant := assistant.New(chatGPT)
 
 		codeAssistant.RailsSchemaToEntities(railsSchema, model.SourceCodeHandlers(func(code model.SourceCode) model.SourceCode {

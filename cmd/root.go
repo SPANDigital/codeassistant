@@ -50,9 +50,9 @@ func init() {
 	if err := viper.BindPFlag("openAiApiKey", rootCmd.PersistentFlags().Lookup("openAiApiKey")); err != nil {
 		log.Fatal("Unable to find flag openAiApiKey", err)
 	}
-	rootCmd.PersistentFlags().String("user", "", "User to send to ChatGPT")
-	if err := viper.BindPFlag("user", rootCmd.PersistentFlags().Lookup("user")); err != nil {
-		log.Fatal("Unable to find flag user", err)
+	rootCmd.PersistentFlags().String("userEmail", "", "User to send to ChatGPT")
+	if err := viper.BindPFlag("userEmail", rootCmd.PersistentFlags().Lookup("userEmail")); err != nil {
+		log.Fatal("Unable to find flag userEmail", err)
 	}
 }
 

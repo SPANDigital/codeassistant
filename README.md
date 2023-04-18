@@ -3,7 +3,7 @@ Use ChatGPT API to automate programming tasks
 
 ## OpenAI API Key
 
-codeassistant requires a OpenAI API Key to use.
+codeassistant requires a OpenAI:wq API Key to use.
 
 ## Default values
 
