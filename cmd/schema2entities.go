@@ -9,6 +9,7 @@ import (
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/model"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"golang.org/x/time/rate"
 	"os"
 	"time"
@@ -39,7 +40,8 @@ to quickly create a Cobra application.`,
 		// convert the []byte buffer to a string
 		railsSchema := string(data)
 
-		chatGPT := client.New(chatGptApiKey, rate.NewLimiter(rate.Every(60*time.Second), 20))
+		openAiApiKey := viper.GetString("openAiApiKey")
+		chatGPT := client.New(openAiApiKey, rate.NewLimiter(rate.Every(60*time.Second), 20))
 		codeAssistant := assistant.New(chatGPT)
 
 		codeAssistant.RailsSchemaToEntities(railsSchema, model.SourceCodeHandlers(func(code model.SourceCode) model.SourceCode {

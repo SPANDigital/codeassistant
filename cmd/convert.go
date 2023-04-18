@@ -7,6 +7,7 @@ import (
 	"github.com/spandigitial/codeassistant/assistant"
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/model"
+	"github.com/spf13/viper"
 	"golang.org/x/time/rate"
 	"os"
 	"path"
@@ -33,7 +34,8 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 
-		chatGPT := client.New(chatGptApiKey, rate.NewLimiter(rate.Every(60*time.Second), 20))
+		openAiApiKey := viper.GetString("openAiApiKey")
+		chatGPT := client.New(openAiApiKey, rate.NewLimiter(rate.Every(60*time.Second), 20))
 		codeAssistant := assistant.New(chatGPT)
 
 		reader, err := os.Open(src)

@@ -16,6 +16,8 @@ type ChatGPTHttpClient struct {
 	rateLimiter  *rate.Limiter
 	httpClient   *http.Client
 	rlHTTPClient *ratelimit.RLHTTPClient
+	model        string
+	user         *string
 }
 
 type Option func(client *ChatGPTHttpClient)
@@ -24,6 +26,7 @@ func New(apiKey string, rateLimiter *rate.Limiter, options ...Option) *ChatGPTHt
 	c := &ChatGPTHttpClient{
 		apiKey:      apiKey,
 		rateLimiter: rateLimiter,
+		model:       "gpt-3.5-turbo",
 	}
 
 	for _, option := range options {
@@ -47,14 +50,20 @@ func WithHttpClient(httpClient *http.Client) Option {
 	}
 }
 
+func WithUser(user string) Option {
+	return func(client *ChatGPTHttpClient) {
+		client.user = &user
+	}
+}
+
 func (c *ChatGPTHttpClient) Completion(messages ...model.Message) ([]model2.Choice, error) {
 	url := "https://api.openai.com/v1/chat/completions"
 
 	// Create the request body
 	request := model2.ChatGPTRequest{
 		Messages: messages,
-		Model:    "gpt-3.5-turbo",
-		User:     "richard.wooding@spandigital.com",
+		Model:    c.model,
+		User:     c.user,
 	}
 	requestBytes, err := json.Marshal(request)
 	if err != nil {

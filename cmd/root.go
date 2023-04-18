@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -12,7 +13,6 @@ import (
 )
 
 var cfgFile string
-var chatGptApiKey string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -46,11 +46,14 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.codeassistant.yaml)")
-	rootCmd.PersistentFlags().StringVar(&chatGptApiKey, "chatGptApiKey", "", "chatGptApiKey")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().String("openAiApiKey", "", "openAiApiKey")
+	if err := viper.BindPFlag("openAiApiKey", rootCmd.PersistentFlags().Lookup("openAiApiKey")); err != nil {
+		log.Fatal("Unable to find flag openAiApiKey", err)
+	}
+	rootCmd.PersistentFlags().String("user", "", "User to send to ChatGPT")
+	if err := viper.BindPFlag("user", rootCmd.PersistentFlags().Lookup("user")); err != nil {
+		log.Fatal("Unable to find flag user", err)
+	}
 }
 
 // initConfig reads in config file and ENV variables if set.
