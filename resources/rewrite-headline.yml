@@ -1,0 +1,7 @@
+name: rewrite-headline
+inherit: copywriter
+inputs:
+  - headline
+prompts:
+  - role: user
+    content: Rewrite this headline "{headline}".
