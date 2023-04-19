@@ -14,27 +14,51 @@ openAiApiKey: <api key>
 user: <your email adresss>
 ```
 
-
-
 ## installation
 
 Installation requires a personal access token with at least repo access in the HOMEBREW_GITHUB_API_TOKEN environment variable.
 
+### Initial installation
+
 ```bash
 export HOMEBREW_GITHUB_API_TOKEN="<personal access token>"
 brew tap SPANDigital/homebrew-tap
-homebrew install codeassistant
+brew install codeassistant
+```
+
+### Upgrades
+
+```bash
+export HOMEBREW_GITHUB_API_TOKEN="<personal access token>"
+brew up
+brew reinstall codeassistant
 ```
 
 ## Use with Projects with Jetbrains IDEs
 
-### Clone the code assistant repo
+Clone the code assistant repo
+
+```bash
+git clone git@github.com:SPANDigital/codeassistant.git
+```
 
 ### Install in JetBrains IDE
 
 - RubyMine
+  1. Install the Flora plugin in Rubymine
+  2. Craate a '.plugins' in a Rubymine project
+  3. ```bash
+     cp <codeassistentDirectory>/jetbrains/*.plugin.js <projectDiretory>/.plugins
+     ```
+  4. Reload your RubyMine project   
 
 - WebStorm
+  1. Install the Flora plugin in Rubymine
+  2. Craate a '.plugins' in a Rubymine project
+  3. ```bash
+     cp <codeassistentDirectory>/jetbrains/*.plugin.js <projectDiretory>/.plugins
+     ```
+  4. Reload your Webstorm project
 
 ## Commands
 
