@@ -48,7 +48,7 @@ git clone git@github.com:SPANDigital/codeassistant.git
   1. Install the Flora plugin in Rubymine
   2. Craate a '.plugins' in a Rubymine project
   3. ```bash
-     cp <codeassistentDirectory>/jetbrains/*.plugin.js <projectDiretory>/.plugins
+     cp <codeassistentDirectory>/jetbrains/rubymine/*.plugin.js <projectDiretory>/.plugins
      ```
   4. Reload your RubyMine project   
 
@@ -56,7 +56,7 @@ git clone git@github.com:SPANDigital/codeassistant.git
   1. Install the Flora plugin in Rubymine
   2. Craate a '.plugins' in a Rubymine project
   3. ```bash
-     cp <codeassistentDirectory>/jetbrains/*.plugin.js <projectDiretory>/.plugins
+     cp <codeassistentDirectory>/jetbrains/webstorm/*.plugin.js <projectDiretory>/.plugins
      ```
   4. Reload your Webstorm project
 

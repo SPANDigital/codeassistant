@@ -10,7 +10,7 @@ func (a ChatGPTBasedCodeAssistant) WhatIs(term string, handlers ...func(markdown
 	messages := []model.Message{
 		{
 			Role:    "system",
-			Content: "Act as a generator of short but informative articles about technology. Send all responses in Markdown.",
+			Content: "Your are a generator of articles about technology, response should have more then one paragraph. Send all responses in Markdown.",
 		},
 		{
 			Role:    "user",
