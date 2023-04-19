@@ -5,7 +5,7 @@ import (
 	"github.com/spandigitial/codeassistant/model"
 )
 
-func (a ChatGPTBasedCodeAssistant) WhatIs(term string, handlers ...func(markdown string)) error {
+func (a ChatGPTBasedCodeAssistant) Article(term string, handlers ...func(markdown string)) error {
 
 	messages := []model.Message{
 		{
@@ -14,7 +14,7 @@ func (a ChatGPTBasedCodeAssistant) WhatIs(term string, handlers ...func(markdown
 		},
 		{
 			Role:    "user",
-			Content: fmt.Sprintf("What is %s?", term),
+			Content: fmt.Sprintf("Write an article about %s?", term),
 		},
 	}
 

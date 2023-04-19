@@ -14,9 +14,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// whatisCmd represents the whatis command
-var whatisCmd = &cobra.Command{
-	Use:   "whatis",
+// articleCmd represents the whatis command
+var articleCmd = &cobra.Command{
+	Use:   "article",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -30,22 +30,22 @@ to quickly create a Cobra application.`,
 		chatGPT := client.New(openAiApiKey, rate.NewLimiter(rate.Every(60*time.Second), 20), client.WithUser(user))
 		codeAssistant := assistant.New(chatGPT)
 
-		return codeAssistant.WhatIs(args[0], func(markdown string) {
+		return codeAssistant.Article(args[0], func(markdown string) {
 			fmt.Println(markdown)
 		})
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(whatisCmd)
+	rootCmd.AddCommand(articleCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// whatisCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// articleCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// whatisCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// articleCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

@@ -62,10 +62,10 @@ git clone git@github.com:SPANDigital/codeassistant.git
 
 ## Commands
 
-### Retrieve definition of something markdown
+### Retrieve article abiut something in markdown
 
 ```bash
-codeassistant whatis <term>
+codeassistant article <term>
 ```
 
 ### Generate NestJS entities and basic services from a Ruby on Rails Schema
