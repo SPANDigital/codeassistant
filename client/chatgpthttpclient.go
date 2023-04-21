@@ -27,6 +27,7 @@ func New(apiKey string, rateLimiter *rate.Limiter, options ...Option) *ChatGPTHt
 		apiKey:      apiKey,
 		rateLimiter: rateLimiter,
 		model:       "gpt-3.5-turbo",
+		//model: "gpt-4",
 	}
 
 	for _, option := range options {

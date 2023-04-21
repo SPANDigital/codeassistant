@@ -60,7 +60,7 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
-	rails2nextjsCmd.AddCommand(schema2entitiesCmd)
+	rootCmd.AddCommand(schema2entitiesCmd)
 
 	// Here you will define your flags and configuration settings.
 
