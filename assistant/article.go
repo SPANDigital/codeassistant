@@ -7,7 +7,7 @@ import (
 
 func (a ChatGPTBasedCodeAssistant) Article(term string, handlers ...func(markdown string)) error {
 
-	messages := []model.Message{
+	messages := []model.Prompt{
 		{
 			Role:    "system",
 			Content: "Your are a generator of articles about technology, response should have more then one paragraph. Send all responses in Markdown.",

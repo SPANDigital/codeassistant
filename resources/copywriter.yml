@@ -1,5 +1,5 @@
 name: copywriter
-model: chat-gpt-3.5-turbo
+model: gpt-3.5-turbo
 prompts:
   - role: system
     content: >

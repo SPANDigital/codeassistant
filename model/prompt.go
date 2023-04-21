@@ -8,9 +8,9 @@ import (
 	"strings"
 )
 
-type Message struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
+type Prompt struct {
+	Role    string `json:"role" yaml:"role"`
+	Content string `json:"content" yaml:"content"`
 }
 
 func writeLines(w bytes.Buffer, source []byte, n ast.Node) {
@@ -21,7 +21,7 @@ func writeLines(w bytes.Buffer, source []byte, n ast.Node) {
 	}
 }
 
-func (m Message) FencedCodeBlocks() []FencedCodeBlock {
+func (m Prompt) FencedCodeBlocks() []FencedCodeBlock {
 	source := []byte(m.Content)
 	node := goldmark.DefaultParser().Parse(text.NewReader(source))
 	var codeBlocks []FencedCodeBlock

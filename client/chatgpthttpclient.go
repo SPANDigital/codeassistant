@@ -56,7 +56,7 @@ func WithUser(user string) Option {
 	}
 }
 
-func (c *ChatGPTHttpClient) Completion(messages ...model.Message) ([]model2.Choice, error) {
+func (c *ChatGPTHttpClient) Completion(messages ...model.Prompt) ([]model2.Choice, error) {
 	url := "https://api.openai.com/v1/chat/completions"
 
 	// Create the request body

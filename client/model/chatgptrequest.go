@@ -5,7 +5,7 @@ import (
 )
 
 type ChatGPTRequest struct {
-	Model    string          `json:"model"`
-	Messages []model.Message `json:"messages"`
-	User     *string         `json:"user"`
+	Model    string         `json:"model"`
+	Messages []model.Prompt `json:"messages"`
+	User     *string        `json:"user"`
 }

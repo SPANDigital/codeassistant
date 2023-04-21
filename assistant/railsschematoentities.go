@@ -14,7 +14,7 @@ func (a ChatGPTBasedCodeAssistant) RailsSchemaToEntities(railsSchema string, ent
 
 	for _, match := range createTableRe.FindAllStringSubmatch(railsSchema, -1) {
 
-		messages := []model.Message{
+		messages := []model.Prompt{
 			{
 				Role:    "system",
 				Content: "You are a typescript code generating bot. Format all output in markdown. For every question answer with one block of code which is a class in typescript. Do not return code snippets.",
@@ -49,7 +49,7 @@ func (a ChatGPTBasedCodeAssistant) RailsSchemaToEntities(railsSchema string, ent
 
 			classNameLower := strings.ToLower(className)
 
-			messages = []model.Message{
+			messages = []model.Prompt{
 				{
 					Role:    "system",
 					Content: "You are a typescript code generating bot. Format all output in markdown. For every question answer with one block of code which is a class in typescript. Do not return code snippets.",
