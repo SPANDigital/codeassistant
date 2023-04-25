@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/Masterminds/sprig/v3"
 	"io"
 	"os"
 	"strings"
@@ -26,7 +27,7 @@ func stdin() (string, error) {
 
 func runParamTemplate(input string) (string, error) {
 
-	tmpl, err := template.New("paramTemplate").Funcs(map[string]any{
+	tmpl, err := template.New("paramTemplate").Funcs(sprig.FuncMap()).Funcs(map[string]any{
 		"stdin": stdin,
 	}).Parse(input)
 	if err != nil {
