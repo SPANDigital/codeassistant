@@ -10,7 +10,7 @@ import (
 
 type Prompt struct {
 	Role    string `json:"role" yaml:"role"`
-	Content string `json:"content" yaml:"content"`
+	Content string `json:"content"" yaml:"content"`
 }
 
 func writeLines(w bytes.Buffer, source []byte, n ast.Node) {

@@ -1,14 +1,16 @@
 package model
 
 type Command struct {
-	Library *Library
-	Name    string            `yaml:"name"`
-	Model   string            `yaml:"model"`
-	Usage   string            `yaml:"usage"`
-	Inherit string            `yaml:"inherit"`
-	Params  map[string]string `yaml:"params"`
-	Prompts []Prompt          `yaml:"prompts"`
-	System  bool              `yaml:"system"`
+	Library     *Library
+	Name        string            `yaml:"name"`
+	Model       string            `yaml:"model"`
+	Usage       string            `yaml:"usage"`
+	Inherit     string            `yaml:"inherit"`
+	Params      map[string]string `yaml:"params"`
+	Prompts     []Prompt          `yaml:"prompts"`
+	System      bool              `yaml:"system"`
+	Temperature *float32          `yaml:"temperature"`
+	TopP        *float32          `yaml:"top_p"`
 }
 
 func (c *Command) AllPrompts() []Prompt {

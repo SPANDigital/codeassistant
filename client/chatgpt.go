@@ -6,5 +6,5 @@ import (
 )
 
 type ChatGPT interface {
-	Completion(messages ...model.Prompt) ([]model2.Choice, error)
+	Completion(command *model.CommandInstance) ([]model2.Choice, error)
 }

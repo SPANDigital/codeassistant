@@ -3,12 +3,14 @@ package client
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	model2 "github.com/spandigitial/codeassistant/client/model"
 	"github.com/spandigitial/codeassistant/model"
 	"github.com/spandigitial/codeassistant/ratelimit"
 	"golang.org/x/time/rate"
 	"io"
 	"net/http"
+	"os"
 )
 
 type ChatGPTHttpClient struct {
@@ -57,14 +59,25 @@ func WithUser(user string) Option {
 	}
 }
 
-func (c *ChatGPTHttpClient) Completion(messages ...model.Prompt) ([]model2.Choice, error) {
+func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance) ([]model2.Choice, error) {
 	url := "https://api.openai.com/v1/chat/completions"
+
+	fmt.Fprintln(os.Stderr, "Send following prompts to ChatGPT")
+	for _, prompt := range commandInstance.Prompts {
+		fmt.Fprintf(os.Stderr, ">>> (%s) %s\n", prompt.Role, prompt.Content)
+	}
 
 	// Create the request body
 	request := model2.ChatGPTRequest{
-		Messages: messages,
+		Messages: commandInstance.Prompts,
 		Model:    c.model,
 		User:     c.user,
+	}
+	if commandInstance.Command.Temperature != nil {
+		request.Temperature = commandInstance.Command.Temperature
+	}
+	if commandInstance.Command.TopP != nil {
+		request.TopP = commandInstance.Command.TopP
 	}
 	requestBytes, err := json.Marshal(request)
 	if err != nil {

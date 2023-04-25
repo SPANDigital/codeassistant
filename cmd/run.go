@@ -25,7 +25,7 @@ var runPromptsCmd = &cobra.Command{
 		openAiApiKey := viper.GetString("openAiApiKey")
 		user := viper.GetString("userEmail")
 		chatGPT := client.New(openAiApiKey, rate.NewLimiter(rate.Every(60*time.Second), 20), client.WithUser(user))
-		choices, err := chatGPT.Completion(commandInstance.Prompts...)
+		choices, err := chatGPT.Completion(commandInstance)
 		if err != nil {
 			return err
 		}
