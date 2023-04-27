@@ -29,72 +29,22 @@ brew install codeassistant
 ### Upgrades
 
 ```bash
-export HOMEBREW_GITHUB_API_TOKEN="<personal access token>"
 brew up
 brew reinstall codeassistant
 ```
 
-## Use with Projects with Jetbrains IDEs
+## Usage
 
-Clone the code assistant repo
+## List available comand in your prompt libraries
 
 ```bash
-git clone git@github.com:SPANDigital/codeassistant.git
+codeassistant list
 ```
 
-### Install in JetBrains IDE
-
-- RubyMine
-  1. Install the Flora plugin in Rubymine
-  2. Craate a '.plugins' in a Rubymine project
-  3. ```bash
-     cp <codeassistentDirectory>/jetbrains/rubymine/*.plugin.js <projectDiretory>/.plugins
-     ```
-  4. Reload your RubyMine project   
-
-- WebStorm
-  1. Install the Flora plugin in Rubymine
-  2. Craate a '.plugins' in a Rubymine project
-  3. ```bash
-     cp <codeassistentDirectory>/jetbrains/webstorm/*.plugin.js <projectDiretory>/.plugins
-     ```
-  4. Reload your Webstorm project
-
-## Commands
-
-### Retrieve article abiut something in markdown
+## List commands in a prompt library
 
 ```bash
-codeassistant article <term>
-```
-
-### Generate NestJS entities and basic services from a Ruby on Rails Schema
-
-```bash
-codeassistant rails2nestjs schema2entities \
-  --schemaFilename <pathToRubyOnRailsSchema> \
-  --entitiesDirectory <directoryToSaveEntities> \
-  --servicesDirectory <directoryToSaveServices> 
-```
-
-### Convert Ruby on Rails Controllers to NestJS Controllers
-
-```bash
-codeassistant rails2nestjs convert \
-  --railstype controller \
-  --nestjstype controller \
-  --src <sourceToRubyFile> \
-  --dest <destinationTypeScript>
-```
-
-### Convert Ruby on Rails RSpec to NestJS Tests using Jest
-
-```bash
-codeassistant rails2nestjs convert \
-  --railstype spec \
-  --nestjstype "test using jest" \ 
-  --src <sourceToRubyFile> \
-  --dest <destinationTypeScript>
+codeassistant run <library> <command> <var1:value> <vae2:value>
 ```
 
 This `README.md` file is documentation:
