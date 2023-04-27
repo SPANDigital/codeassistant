@@ -21,7 +21,6 @@ Installation requires a personal access token with at least repo access in the H
 ### Initial installation
 
 ```bash
-export HOMEBREW_GITHUB_API_TOKEN="<personal access token>"
 brew tap SPANDigital/homebrew-tap
 brew install codeassistant
 ```
