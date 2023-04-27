@@ -1,6 +1,5 @@
-/*
-Copyright © 2023 richard.wooding@spandigital.com
-*/
+// SPDX-License-Identifier: MIT
+
 package cmd
 
 import (

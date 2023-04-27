@@ -1,6 +1,9 @@
+// SPDX-License-Identifier: MIT
+
 package model
 
 import (
+	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
 	"io/fs"
 	"os"
@@ -13,13 +16,19 @@ func buildLibraries() map[string]*Library {
 
 	libraries := make(map[string]*Library)
 
-	// Find home directory.
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return libraries
-	}
+	var promptsLibrary string
+	if viper.GetString("promptLibraryDir") == "" {
 
-	promptsLibrary := filepath.Join(home, "prompts-library")
+		// Find home directory.
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return libraries
+		}
+
+		promptsLibrary = filepath.Join(home, "prompts-library")
+	} else {
+		promptsLibrary = viper.GetString("promptLibraryDir")
+	}
 
 	libraryFromDir := func(path string) *Library {
 		relPath, err := filepath.Rel(promptsLibrary, path)

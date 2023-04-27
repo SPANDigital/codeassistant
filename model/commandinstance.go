@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 package model
 
 import (
@@ -73,7 +75,11 @@ func (ci *CommandInstance) buildParams(args []string) {
 
 func (ci *CommandInstance) buildPrompts() ([]Prompt, error) {
 	prompts := make([]Prompt, 0)
-	for _, prompt := range ci.Command.AllPrompts() {
+	allPrompts, err := ci.Command.AllPrompts()
+	if err != nil {
+		return nil, err
+	}
+	for _, prompt := range allPrompts {
 		content, err := ci.runContentTemplate(prompt.Content)
 		if err != nil {
 			return nil, err

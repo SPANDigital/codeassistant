@@ -150,7 +150,7 @@ brews:
     description: "Software to create fast and easy drum rolls."
 
     # SPDX identifier of your app's license.
-    # license: "MIT"
+    license: "MIT"
 
     # Setting this will prevent goreleaser to actually try to commit the updated
     # formula - instead, the formula file will be stored on the dist folder only,

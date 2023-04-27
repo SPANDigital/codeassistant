@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 package client
 
 import (
@@ -72,6 +74,11 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance) (
 		Messages: commandInstance.Prompts,
 		Model:    c.model,
 		User:     c.user,
+	}
+	if commandInstance.Command.Model != "" {
+		request.Model = commandInstance.Command.Model
+	} else {
+		request.Model = "gpt-3.5-turbo"
 	}
 	if commandInstance.Command.Temperature != nil {
 		request.Temperature = commandInstance.Command.Temperature

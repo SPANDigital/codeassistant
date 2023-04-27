@@ -1,7 +1,5 @@
-/*
-Copyright © 2023 richard.wooding@spandigital.com
+// SPDX-License-Identifier: MIT
 
-*/
 package main
 
 import "github.com/spandigitial/codeassistant/cmd"

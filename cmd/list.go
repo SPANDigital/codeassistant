@@ -1,6 +1,5 @@
-/*
-Copyright © 2023 richard.wooding@spandigital.com
-*/
+// SPDX-License-Identifier: MIT
+
 package cmd
 
 import (
@@ -17,7 +16,7 @@ var listPromptsCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		for _, library := range model.Libraries {
 			for _, command := range library.Commands {
-				if !command.System {
+				if !command.Abstract {
 					params := ""
 					for param, value := range command.Params {
 						var display string

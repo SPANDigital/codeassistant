@@ -96,3 +96,7 @@ codeassistant rails2nestjs convert \
   --src <sourceToRubyFile> \
   --dest <destinationTypeScript>
 ```
+
+This `README.md` file is documentation:
+
+`SPDX-License-Identifier: MIT`

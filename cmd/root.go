@@ -1,6 +1,5 @@
-/*
-Copyright © 2023 richard.wooding@spandigital.com
-*/
+// SPDX-License-Identifier: MIT
+
 package cmd
 
 import (
@@ -53,6 +52,10 @@ func init() {
 	rootCmd.PersistentFlags().String("userEmail", "", "User to send to ChatGPT")
 	if err := viper.BindPFlag("userEmail", rootCmd.PersistentFlags().Lookup("userEmail")); err != nil {
 		log.Fatal("Unable to find flag userEmail", err)
+	}
+	rootCmd.PersistentFlags().String("promptLibraryDir", "", "PRompt library Dir")
+	if err := viper.BindPFlag("promptLibraryDir", rootCmd.PersistentFlags().Lookup("promptLibraryDir")); err != nil {
+		log.Fatal("Unable to find flag promptLibraryDir", err)
 	}
 }
 

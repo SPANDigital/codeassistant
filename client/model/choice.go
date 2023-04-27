@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: MIT
+
 package model
 
 import "github.com/spandigitial/codeassistant/model"
