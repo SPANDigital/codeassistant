@@ -13,6 +13,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 )
 
 type ChatGPTHttpClient struct {
@@ -58,7 +59,9 @@ func WithUser(user string) Option {
 	}
 }
 
-func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance) ([]model2.Choice, error) {
+var dataRegex = regexp.MustCompile("data: (.+)")
+
+func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, handlers ...ChoiceHandler) error {
 	url := "https://api.openai.com/v1/chat/completions"
 
 	fmt.Fprintln(os.Stderr, "Send following prompts to ChatGPT")
@@ -70,6 +73,7 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance) (
 	request := model2.ChatGPTRequest{
 		Messages: commandInstance.Prompts,
 		User:     c.user,
+		Stream:   true,
 	}
 	if commandInstance.Command.Model != "" {
 		request.Model = commandInstance.Command.Model
@@ -82,10 +86,13 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance) (
 	if commandInstance.Command.TopP != nil {
 		request.TopP = commandInstance.Command.TopP
 	}
+
 	requestBytes, err := json.Marshal(request)
 	if err != nil {
 		panic(err)
 	}
+
+	fmt.Fprintf(os.Stderr, "Reqeust bytes%s\n", string(requestBytes))
 
 	// Create the HTTP request
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBytes))
@@ -93,28 +100,46 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance) (
 		panic(err)
 	}
 	req.Header.Set("User-Agent", "SPAN Digital code assistant")
+	req.Header.Set("Cache-Control", "no-cache")
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "text/event-stream")
+	req.Header.Set("Connection", "keep-alive")
 	req.Header.Set("Authorization", "Bearer "+c.apiKey)
 
 	// Send the HTTP request]
 	resp, err := c.rlHTTPClient.Do(req)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer resp.Body.Close()
 
-	// Read the response body
-	responseBytes, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
+	for {
+		data := make([]byte, 1024)
+		_, err := resp.Body.Read(data)
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+
+		matches := dataRegex.FindSubmatch(data)
+
+		if len(matches) > 0 {
+			var response model2.ChatGPTResponse
+			err = json.Unmarshal(matches[1], &response)
+			if err == nil {
+				for _, choice := range response.Choices {
+					for _, handler := range handlers {
+						handler(response.Object, choice)
+					}
+				}
+			} else {
+				return err
+			}
+		}
+
 	}
 
-	// Parse the response JSON
-	var response model2.ChatGPTResponse
-	err = json.Unmarshal(responseBytes, &response)
-	if err != nil {
-		return nil, err
-	}
-
-	return response.Choices, nil
+	return nil
 }

@@ -7,6 +7,8 @@ import (
 	"github.com/spandigitial/codeassistant/model"
 )
 
+type ChoiceHandler func(objectType string, choice model2.Choice)
+
 type ChatGPT interface {
-	Completion(command *model.CommandInstance) ([]model2.Choice, error)
+	Completion(command *model.CommandInstance, handlers ...ChoiceHandler) error
 }

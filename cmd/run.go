@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/spandigitial/codeassistant/client"
+	model2 "github.com/spandigitial/codeassistant/client/model"
 	"github.com/spandigitial/codeassistant/model"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -27,16 +28,15 @@ var runPromptsCmd = &cobra.Command{
 		openAiApiKey := viper.GetString("openAiApiKey")
 		user := viper.GetString("userEmail")
 		chatGPT := client.New(openAiApiKey, rate.NewLimiter(rate.Every(60*time.Second), 20), client.WithUser(user))
-		choices, err := chatGPT.Completion(commandInstance)
-		if err != nil {
-			return err
-		}
 		f := bufio.NewWriter(os.Stdout)
 		defer f.Flush()
-		for _, choice := range choices {
-			fmt.Fprintln(f, choice.Message.Content)
-		}
-		return nil
+		err = chatGPT.Completion(commandInstance, func(objectType string, choice model2.Choice) {
+			if objectType == "chat.completion.chunk" && choice.Delta != nil {
+				fmt.Fprintf(f, "%s", choice.Delta.Content)
+			}
+		})
+		fmt.Fprintln(f)
+		return err
 	},
 }
 
