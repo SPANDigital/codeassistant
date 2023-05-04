@@ -44,7 +44,7 @@ func runParamTemplate(input string) (string, error) {
 }
 
 func (ci *CommandInstance) runContentTemplate(content string) (string, error) {
-	tmpl, err := template.New("runContentTemplate").Parse(content)
+	tmpl, err := template.New("runContentTemplate").Funcs(sprig.FuncMap()).Parse(content)
 	if err != nil {
 		return "", err
 	}
