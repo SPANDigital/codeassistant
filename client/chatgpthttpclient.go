@@ -92,8 +92,6 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 		panic(err)
 	}
 
-	fmt.Fprintf(os.Stderr, "Reqeust bytes%s\n", string(requestBytes))
-
 	// Create the HTTP request
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBytes))
 	if err != nil {
