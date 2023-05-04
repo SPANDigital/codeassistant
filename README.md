@@ -12,7 +12,7 @@ It is recommended you set up codeassistant with a config file at `$HOME/.codeass
 ```yaml
 openAiApiKey: <api key>
 user: <your email adresss>
-promptLibraryDir: <directory to load prompts, defaults to $HOME/prompts-library>
+promptsLibraryDir: <directory to load prompts, defaults to $HOME/prompts-library>
 ```
 
 ## installation
