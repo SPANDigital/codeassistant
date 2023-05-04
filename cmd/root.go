@@ -53,9 +53,9 @@ func init() {
 	if err := viper.BindPFlag("userEmail", rootCmd.PersistentFlags().Lookup("userEmail")); err != nil {
 		log.Fatal("Unable to find flag userEmail", err)
 	}
-	rootCmd.PersistentFlags().String("promptLibraryDir", "", "PRompt library Dir")
-	if err := viper.BindPFlag("promptLibraryDir", rootCmd.PersistentFlags().Lookup("promptLibraryDir")); err != nil {
-		log.Fatal("Unable to find flag promptLibraryDir", err)
+	rootCmd.PersistentFlags().String("promptsLibraryDir", "", "Prompt library Dir")
+	if err := viper.BindPFlag("promptsLibraryDir", rootCmd.PersistentFlags().Lookup("promptsLibraryDir")); err != nil {
+		log.Fatal("Unable to find flag promptsLibraryDir", err)
 	}
 }
 

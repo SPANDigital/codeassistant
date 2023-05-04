@@ -27,7 +27,7 @@ var listPromptsCmd = &cobra.Command{
 						}
 						params = fmt.Sprintf("%s %s:%s>", params, param, display)
 					}
-					fmt.Printf("%s %s%s\n", library.Name, command.Name, params)
+					fmt.Printf("codeassistant run %s %s%s\n", library.Name, command.Name, params)
 				}
 			}
 		}
