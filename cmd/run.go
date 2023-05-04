@@ -3,6 +3,7 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/model"
@@ -30,8 +31,10 @@ var runPromptsCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		f := bufio.NewWriter(os.Stdout)
+		defer f.Flush()
 		for _, choice := range choices {
-			fmt.Fprintln(os.Stdout, choice.Message.Content)
+			fmt.Fprintln(f, choice.Message.Content)
 		}
 		return nil
 	},
