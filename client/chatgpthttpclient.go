@@ -20,7 +20,6 @@ type ChatGPTHttpClient struct {
 	rateLimiter  *rate.Limiter
 	httpClient   *http.Client
 	rlHTTPClient *ratelimit.RLHTTPClient
-	model        string
 	user         *string
 }
 
@@ -30,8 +29,6 @@ func New(apiKey string, rateLimiter *rate.Limiter, options ...Option) *ChatGPTHt
 	c := &ChatGPTHttpClient{
 		apiKey:      apiKey,
 		rateLimiter: rateLimiter,
-		model:       "gpt-3.5-turbo",
-		//model: "gpt-4",
 	}
 
 	for _, option := range options {
@@ -72,7 +69,6 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance) (
 	// Create the request body
 	request := model2.ChatGPTRequest{
 		Messages: commandInstance.Prompts,
-		Model:    c.model,
 		User:     c.user,
 	}
 	if commandInstance.Command.Model != "" {
