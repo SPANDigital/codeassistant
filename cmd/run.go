@@ -3,11 +3,13 @@
 package cmd
 
 import (
+	"fmt"
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/model"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"golang.org/x/time/rate"
+	"os"
 	"time"
 )
 
@@ -29,7 +31,7 @@ var runPromptsCmd = &cobra.Command{
 			return err
 		}
 		for _, choice := range choices {
-			println(choice.Message.Content)
+			fmt.Fprintln(os.Stdout, choice.Message.Content)
 		}
 		return nil
 	},
