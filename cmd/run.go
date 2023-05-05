@@ -20,23 +20,24 @@ var runPromptsCmd = &cobra.Command{
 	Use:   "run",
 	Short: "Run prompts from prompt database",
 	Long:  `Run prompts from prompt database.`,
-	RunE: func(cmd *cobra.Command, args []string) error {
+	Run: func(cmd *cobra.Command, args []string) {
 		commandInstance, err := model.NewCommandInstance(args)
-		if err != nil {
-			return err
+		if err == nil {
+			openAiApiKey := viper.GetString("openAiApiKey")
+			user := viper.GetString("userEmail")
+			chatGPT := client.New(openAiApiKey, rate.NewLimiter(rate.Every(60*time.Second), 20), client.WithUser(user))
+			f := bufio.NewWriter(os.Stdout)
+			defer f.Flush()
+			err = chatGPT.Completion(commandInstance, func(objectType string, choice model2.Choice) {
+				if objectType == "chat.completion.chunk" && choice.Delta != nil {
+					fmt.Fprintf(f, "%s", choice.Delta.Content)
+				}
+			})
+			fmt.Fprintln(f)
 		}
-		openAiApiKey := viper.GetString("openAiApiKey")
-		user := viper.GetString("userEmail")
-		chatGPT := client.New(openAiApiKey, rate.NewLimiter(rate.Every(60*time.Second), 20), client.WithUser(user))
-		f := bufio.NewWriter(os.Stdout)
-		defer f.Flush()
-		err = chatGPT.Completion(commandInstance, func(objectType string, choice model2.Choice) {
-			if objectType == "chat.completion.chunk" && choice.Delta != nil {
-				fmt.Fprintf(f, "%s", choice.Delta.Content)
-			}
-		})
-		fmt.Fprintln(f)
-		return err
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+		}
 	},
 }
 

@@ -113,7 +113,8 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 
 	for {
 		data := make([]byte, 1024)
-		_, err := resp.Body.Read(data)
+		read, err := resp.Body.Read(data)
+		fmt.Fprintln(os.Stderr, "Response", string(data))
 		if err == io.EOF {
 			return nil
 		}
@@ -121,11 +122,25 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 			return err
 		}
 
+		if len(data) > 0 && string(data[:1]) == "{" {
+			var response model2.ChatGPTResponse
+			err = json.Unmarshal(data[:read], &response)
+			if response.Error != nil {
+				return response.Error
+			}
+			if err != nil {
+				return err
+			}
+		}
+
 		matches := dataRegex.FindSubmatch(data)
 
 		if len(matches) > 0 {
 			var response model2.ChatGPTResponse
 			err = json.Unmarshal(matches[1], &response)
+			if response.Error != nil {
+				return response.Error
+			}
 			if err == nil {
 				for _, choice := range response.Choices {
 					for _, handler := range handlers {

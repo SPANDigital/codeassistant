@@ -8,4 +8,5 @@ type ChatGPTResponse struct {
 	Created int      `json:"created"`
 	Model   string   `json:"model"`
 	Choices []Choice `json:"choices"`
+	Error   *Error   `json:"error"`
 }
