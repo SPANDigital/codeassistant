@@ -59,7 +59,7 @@ func WithUser(user string) Option {
 	}
 }
 
-var dataRegex = regexp.MustCompile("data: (.+)")
+var dataRegex = regexp.MustCompile("data: (\\{.+\\})\\w?")
 
 func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, handlers ...ChoiceHandler) error {
 	url := "https://api.openai.com/v1/chat/completions"
@@ -111,10 +111,11 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 	}
 	defer resp.Body.Close()
 
+	var buff bytes.Buffer
 	for {
 		data := make([]byte, 1024)
 		read, err := resp.Body.Read(data)
-		fmt.Fprintln(os.Stderr, "Response", string(data))
+		//fmt.Fprintln(os.Stderr, "Response", string(data))
 		if err == io.EOF {
 			return nil
 		}
@@ -122,34 +123,43 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 			return err
 		}
 
-		if len(data) > 0 && string(data[:1]) == "{" {
-			var response model2.ChatGPTResponse
-			err = json.Unmarshal(data[:read], &response)
-			if response.Error != nil {
-				return response.Error
+		buff.Write(data[:read])
+		bytes := buff.Bytes()
+		size := len(bytes)
+		if string(bytes[size-1:size]) == "\n" {
+			if len(data) > 0 && string(data[:1]) == "{" {
+				var response model2.ChatGPTResponse
+				err = json.Unmarshal(data[:read], &response)
+				if response.Error != nil {
+					return response.Error
+				}
+				if err != nil {
+					return err
+				}
+				return fmt.Errorf("unexecpted response: %s", string(bytes))
 			}
-			if err != nil {
-				return err
-			}
-		}
 
-		matches := dataRegex.FindSubmatch(data)
+			allMatches := dataRegex.FindAllSubmatch(bytes, -1)
+			for _, matches := range allMatches {
 
-		if len(matches) > 0 {
-			var response model2.ChatGPTResponse
-			err = json.Unmarshal(matches[1], &response)
-			if response.Error != nil {
-				return response.Error
-			}
-			if err == nil {
-				for _, choice := range response.Choices {
-					for _, handler := range handlers {
-						handler(response.Object, choice)
+				if len(matches) > 0 {
+					var response model2.ChatGPTResponse
+					err = json.Unmarshal(matches[1], &response)
+					if response.Error != nil {
+						return response.Error
+					}
+					if err == nil {
+						for _, choice := range response.Choices {
+							for _, handler := range handlers {
+								handler(response.Object, choice)
+							}
+						}
+					} else {
+						return err
 					}
 				}
-			} else {
-				return err
 			}
+			buff.Reset()
 		}
 
 	}
