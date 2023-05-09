@@ -35,8 +35,6 @@ debug:
 
 ## installation
 
-Installation requires a personal access token with at least repo access in the HOMEBREW_GITHUB_API_TOKEN environment variable.
-
 ### Initial installation
 
 ```bash
