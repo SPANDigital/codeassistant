@@ -98,7 +98,7 @@ func NewCommandInstance(args []string) (*CommandInstance, error) {
 		return nil, errors.New("at least two arguments are required to construct a command instance")
 	}
 	libraryName, commandName := args[0], args[1]
-	library, found := Libraries[libraryName]
+	library, found := BuildLibraries()[libraryName]
 	if !found {
 		return nil, fmt.Errorf("library: '%s' not found", libraryName)
 	}

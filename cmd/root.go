@@ -4,6 +4,7 @@ package cmd
 
 import (
 	"fmt"
+	debugger2 "github.com/spandigitial/codeassistant/client/debugger"
 	"log"
 	"os"
 
@@ -12,6 +13,7 @@ import (
 )
 
 var cfgFile string
+var debugger *debugger2.Debugger
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -26,6 +28,12 @@ to quickly create a Cobra application.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
+	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		debugger = debugger2.New(viper.GetStringSlice("debug")...)
+		if debugger.IsRecording("configuration") {
+			debugger.Message("configuration", fmt.Sprintf("%v", viper.AllSettings()))
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -35,6 +43,7 @@ func Execute() {
 	if err != nil {
 		os.Exit(1)
 	}
+
 }
 
 func init() {
@@ -57,6 +66,15 @@ func init() {
 	if err := viper.BindPFlag("promptsLibraryDir", rootCmd.PersistentFlags().Lookup("promptsLibraryDir")); err != nil {
 		log.Fatal("Unable to find flag promptsLibraryDir", err)
 	}
+	rootCmd.PersistentFlags().String("userAgent", "", "HTTP User-Agent (default is SPANDigital codeassistant)")
+	if err := viper.BindPFlag("userAgent", rootCmd.PersistentFlags().Lookup("userAgent")); err != nil {
+		log.Fatal("Unable to find flag userAgent", err)
+	}
+	rootCmd.PersistentFlags().StringArray("debug", nil, "details to debug, recognized values: request-header,sent-prompt,request-payload,response-header,request-time,first-reponse-time,last-response-time")
+	if err := viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug")); err != nil {
+		log.Fatal("Unable to find flag debugDetails", err)
+	}
+
 }
 
 // initConfig reads in config file and ENV variables if set.

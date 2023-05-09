@@ -15,6 +15,24 @@ user: <your email adresss>
 promptsLibraryDir: <directory to load prompts, defaults to $HOME/prompts-library>
 ```
 
+More complex configurations are possible
+
+```yaml
+openAiApiKey: <api key>
+user: <your email adresss>
+promptsLibraryDir: <directory to load prompts, defaults to $HOME/prompts-library>
+userAgent: <use this for user agent header>
+debug:
+  - configuration
+  - sent-prompt
+  - request-header
+  - response-header
+  - request-time
+  - first-response-time
+  - last-response-time
+```
+
+
 ## installation
 
 Installation requires a personal access token with at least repo access in the HOMEBREW_GITHUB_API_TOKEN environment variable.

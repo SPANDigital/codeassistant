@@ -14,7 +14,7 @@ var listPromptsCmd = &cobra.Command{
 	Short: "List prompts from prompt database",
 	Long:  `List prompts from prompt database.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		for _, library := range model.Libraries {
+		for _, library := range model.BuildLibraries() {
 			for _, command := range library.Commands {
 				if !command.Abstract {
 					params := ""

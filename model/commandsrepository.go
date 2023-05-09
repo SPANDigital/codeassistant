@@ -10,9 +10,7 @@ import (
 	"path/filepath"
 )
 
-var Libraries = buildLibraries()
-
-func buildLibraries() map[string]*Library {
+func BuildLibraries() map[string]*Library {
 
 	libraries := make(map[string]*Library)
 

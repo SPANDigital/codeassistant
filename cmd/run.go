@@ -25,7 +25,11 @@ var runPromptsCmd = &cobra.Command{
 		if err == nil {
 			openAiApiKey := viper.GetString("openAiApiKey")
 			user := viper.GetString("userEmail")
-			chatGPT := client.New(openAiApiKey, rate.NewLimiter(rate.Every(60*time.Second), 20), client.WithUser(user))
+			userAgent := viper.GetString("userAgent")
+			if userAgent == "" {
+				userAgent = "SPAN Digital codeassistant"
+			}
+			chatGPT := client.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), client.WithUser(user), client.WithUserAgent(userAgent))
 			f := bufio.NewWriter(os.Stdout)
 			defer f.Flush()
 			err = chatGPT.Completion(commandInstance, func(objectType string, choice model2.Choice) {
