@@ -18,7 +18,7 @@ func NumTokensFromRequest(request model.ChatGPTRequest) (numTokens int) {
 	}
 
 	var tokensPerMessage = 3 // Default to 3
-	//var tokens_per_name 1
+	//var tokens_per_name = 1
 	if strings.HasPrefix(request.Model, "gpt-3.5") {
 		tokensPerMessage = 4
 		//tokens_per_name = -1
@@ -30,7 +30,7 @@ func NumTokensFromRequest(request model.ChatGPTRequest) (numTokens int) {
 		numTokens += tokensPerMessage
 		numTokens += len(tkm.Encode(message.Content, nil, nil))
 		numTokens += len(tkm.Encode(message.Role, nil, nil))
-		// TODO: count tokens for name/role, requires changes in ChatGPTRequest and ChatGPTResponse
+		// TODO: count tokens for name, requires changes in ChatGPTRequest and ChatGPTResponse
 		//num_tokens += len(tkm.Encode(message.Name),nil,nil)
 		//if message.Name != "" {
 		//	num_tokens += tokens_per_name
