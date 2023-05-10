@@ -18,5 +18,5 @@
 .idea/
 
 dist/
-
+!web/dist
 codeassistant
