@@ -3,37 +3,37 @@ Use ChatGPT API to automate programming tasks
 
 ## OpenAI API Key
 
-codeassistant requires a OpenAI:wq API Key to use.
+You will need to configure an OpenAI API Key before usage.
 
 ## Default values
 
-It is recommended you set up codeassistant with a config file at `$HOME/.codeassistant.yaml` for default values
+It is recommended you set up `codeassistant` with a config file at `$HOME/.codeassistant.yaml` for default values:
 
 ```yaml
-openAiApiKey: <api key>
-userEmail: <your email adresss>
+openAiApiKey: "<api key>"
+userEmail: "<your email address>"
 promptsLibraryDir: <directory to load prompts, defaults to $HOME/prompts-library>
 ```
 
-More complex configurations are possible
+More complex configurations are possible:
 
 ```yaml
-openAiApiKey: <api key>
-user: <your email adresss>
+openAiApiKey: "<api key>"
+userEmail: "<your email address>"
 promptsLibraryDir: <directory to load prompts, defaults to $HOME/prompts-library>
-userAgent: <use this for user agent header>
+userAgent: "<use this for user agent header>"
 debug:
   - configuration
-  - sent-prompt
-  - request-header
-  - response-header
-  - request-time
   - first-response-time
   - last-response-time
+  - request-header
+  - request-time
+  - response-header
+  - sent-prompt
+  - tokens-request
 ```
 
-
-## installation
+## Installation
 
 ### Initial installation
 
@@ -51,13 +51,13 @@ brew reinstall codeassistant
 
 ## Usage
 
-## List available comand in your prompt libraries
+### List all the commands in your prompt libraries
 
 ```bash
 codeassistant list
 ```
 
-## List commands in a prompt library
+### List commands for a specific prompt library
 
 ```bash
 codeassistant run <library> <command> <var1:value> <vae2:value>
