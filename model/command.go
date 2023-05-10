@@ -11,7 +11,7 @@ type Command struct {
 	Usage       string            `yaml:"usage"`
 	Inherit     string            `yaml:"inherit"`
 	Params      map[string]string `yaml:"params"`
-	Prompts     []Prompt          `yaml:"prompts"`
+	Prompts     []Prompt          `yaml:"prompts" json:"-"`
 	Abstract    bool              `yaml:"abstract"`
 	Temperature *float32          `yaml:"temperature"`
 	TopP        *float32          `yaml:"top_p"`
