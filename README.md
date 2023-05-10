@@ -28,9 +28,9 @@ debug:
   - last-response-time
   - request-header
   - request-time
+  - request-tokens
   - response-header
   - sent-prompt
-  - tokens-request
 ```
 
 ## Installation

@@ -106,7 +106,9 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 		c.debugger.Message("request-payload", string(requestBytes))
 	}
 
-	c.debugger.Message("tokens-request", fmt.Sprintf("%d", debugger.NumTokensFromRequest(request)))
+	if c.debugger.IsRecording("request-tokens") {
+		c.debugger.Message("request-tokens", fmt.Sprintf("%d", debugger.NumTokensFromRequest(request)))
+	}
 
 	requestTime := time.Now()
 
