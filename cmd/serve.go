@@ -5,6 +5,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/spandigitial/codeassistant/model"
 	"github.com/spandigitial/codeassistant/web"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -26,6 +27,8 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
+		libraries := model.BuildLibraries()
+
 		dist, err := fs.Sub(web.FileSystem, "dist")
 		if err == nil {
 			router := gin.Default()
@@ -33,9 +36,12 @@ to quickly create a Cobra application.`,
 				gin.SetMode(gin.ReleaseMode)
 			}
 			router.GET("/", func(context *gin.Context) {
-				context.Redirect(302, "/web")
+				context.Redirect(http.StatusTemporaryRedirect, "/web")
 			})
 			router.StaticFS("/web", http.FS(dist))
+			router.GET("/api/graph", func(context *gin.Context) {
+				context.JSON(http.StatusOK, libraries)
+			})
 
 			router.Run(fmt.Sprintf(":%d", viper.GetInt("serverHttpPort")))
 		}

@@ -5,7 +5,7 @@ package model
 import "errors"
 
 type Command struct {
-	Library     *Library
+	Library     *Library          `json:"-"`
 	Name        string            `yaml:"name"`
 	Model       string            `yaml:"model"`
 	Usage       string            `yaml:"usage"`
