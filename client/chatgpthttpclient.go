@@ -84,6 +84,7 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 		User:     c.user,
 		Stream:   true,
 	}
+
 	if commandInstance.Command.Model != "" {
 		request.Model = commandInstance.Command.Model
 	} else {
@@ -103,6 +104,10 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 
 	if c.debugger.IsRecording("request-payload") {
 		c.debugger.Message("request-payload", string(requestBytes))
+	}
+
+	if c.debugger.IsRecording("request-tokens") {
+		c.debugger.Message("request-tokens", fmt.Sprintf("%d", debugger.NumTokensFromRequest(request)))
 	}
 
 	requestTime := time.Now()
