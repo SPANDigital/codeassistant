@@ -26,11 +26,15 @@ debug:
   - configuration
   - first-response-time
   - last-response-time
+<<<<<<< HEAD
   - request-header
   - request-time
   - request-tokens
   - response-header
   - sent-prompt
+=======
+  - webserver
+>>>>>>> 9b2ac38 (Webserver)
 ```
 
 ## Installation
