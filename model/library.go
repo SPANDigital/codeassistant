@@ -3,8 +3,10 @@
 package model
 
 type Library struct {
-	Name     string
-	FullPath string `json:"-"`
-	Index    string
-	Commands map[string]*Command
+	Name        string
+	DisplayName string `yaml:"display-name"`
+	Icon        string
+	FullPath    string `json:"-"`
+	Index       string `json:"-"`
+	Commands    map[string]*Command
 }

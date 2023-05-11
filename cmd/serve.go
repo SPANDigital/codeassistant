@@ -38,7 +38,8 @@ to quickly create a Cobra application.`,
 			router.GET("/", func(context *gin.Context) {
 				context.Redirect(http.StatusTemporaryRedirect, "/web")
 			})
-			router.StaticFS("/web", http.FS(dist))
+			httpFs := http.FS(dist)
+			router.StaticFS("/web", httpFs)
 			router.GET("/api/graph", func(context *gin.Context) {
 				context.JSON(http.StatusOK, libraries)
 			})

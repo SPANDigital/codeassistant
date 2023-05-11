@@ -17,9 +17,17 @@ import Link from '@mui/material/Link';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import { mainListItems, secondaryListItems } from './listItems';
 import Deposits from './Deposits';
 import Orders from './Orders';
+import {useEffect, useState} from "react";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemButton from "@mui/material/ListItemButton";
+import LibraryIcon from '@mui/icons-material/LibraryBooks';
+import Icon from '@mui/material/Icon';
+import { BrowserRouter as Router, Routes, Route, Link as RouterLink} from "react-router-dom";
+import Landing from "./landing";
+import Library from "./library";
 
 function Copyright(props: any) {
     return (
@@ -86,7 +94,12 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 
 const mdTheme = createTheme();
 
-function DashboardContent() {
+interface DashboardContentProps {
+    data: object
+    error: string
+}
+
+function DashboardContent({ data }: DashboardContentProps) {
     const [open, setOpen] = React.useState(true);
     const toggleDrawer = () => {
         setOpen(!open);
@@ -94,6 +107,7 @@ function DashboardContent() {
 
     return (
         <ThemeProvider theme={mdTheme}>
+        <Router>
         <Box sx={{ display: 'flex' }}>
     <CssBaseline />
     <AppBar position="absolute" open={open}>
@@ -145,9 +159,17 @@ function DashboardContent() {
     </Toolbar>
     <Divider />
     <List component="nav">
-        {mainListItems}
+        { data && Object.values(data).map((value, index) => {
+            return (
+                <ListItemButton component={RouterLink} to={ "/web/" + value.Name}>
+                    <ListItemIcon>
+                        <Icon>{value.Icon.toLowerCase()}</Icon>
+                    </ListItemIcon>
+                    <ListItemText primary={ value.DisplayName } />
+                </ListItemButton>
+            );
+        })}
         <Divider sx={{ my: 1 }} />
-    {secondaryListItems}
     </List>
     </Drawer>
     <Box
@@ -164,47 +186,46 @@ function DashboardContent() {
 >
     <Toolbar />
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-    <Grid container spacing={3}>
-        {/* Chart */}
-        <Grid item xs={12} md={8} lg={9}>
-    <Paper
-        sx={{
-        p: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            height: 240,
-    }}
->
-    </Paper>
-    </Grid>
-    {/* Recent Deposits */}
-    <Grid item xs={12} md={4} lg={3}>
-    <Paper
-        sx={{
-        p: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            height: 240,
-    }}
->
-    <Deposits />
-    </Paper>
-    </Grid>
-    {/* Recent Orders */}
-    <Grid item xs={12}>
-    <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-    <Orders />
-    </Paper>
-    </Grid>
-    </Grid>
+        <Routes>
+           <Route path="/web" element={<Landing />} />
+           <Route path="/web/:libraryName" element={<Library data={data} />} />
+        </Routes>
     <Copyright sx={{ pt: 4 }} />
     </Container>
     </Box>
     </Box>
+    </Router>
     </ThemeProvider>
 );
 }
 
-export default function Dashboard() {
-    return <DashboardContent />;
+export default function App() {
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        fetch(`/api/graph`)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(
+                        `This is an HTTP error: The status is ${response.status}`
+                    );
+                }
+                return response.json();
+            })
+            .then((actualData) => {
+                setData(actualData);
+                setError(null);
+            })
+            .catch((err) => {
+                setError(err.message);
+                setData(null);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, []);
+
+    return <DashboardContent data={data} error={error} />;
 }
