@@ -2,29 +2,25 @@ import Typography from "@mui/material/Typography";
 import * as React from "react";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Grid";
-import {Link as RouterLink, useParams} from "react-router-dom";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import Icon from "@mui/material/Icon";
-import ListItemText from "@mui/material/ListItemText";
+import {useParams} from "react-router-dom";
 import Divider from "@mui/material/Divider";
-import List from "@mui/material/List";
-import {Button, FormControl, FormHelperText, Input, InputLabel, ListItem, TextField} from "@mui/material";
+import {Button,TextField} from "@mui/material";
 import ReactMarkdown from "react-markdown";
 import {useState} from "react";
-import PromptResponse from "./promptresponse";
+import { useNavigate } from "react-router-dom";
 
 interface LibraryContentProps {
     data: object
 }
 
 export default function Library({ data }: LibraryContentProps) {
-    const [activeCommand, setActiveCommand] = useState("")
     const [message, setMessage] = useState("")
 
+    const navigate = useNavigate();
 
     let { libraryName } = useParams();
     let library = data[libraryName]
+
     return (
         <React.Fragment>
             <Grid item xs={12}>
@@ -37,10 +33,9 @@ export default function Library({ data }: LibraryContentProps) {
                         <ReactMarkdown>{library.Index}</ReactMarkdown>
                     }
 
-                        { data && Object.values(library.Commands).filter(command => activeCommand == "" || command.Name == activeCommand).map((command, index) => {
+                        { data && Object.values(library.Commands).map((command, index) => {
                             let handleSubmit = (event) => {
                                 event.preventDefault()
-                                setActiveCommand(command.Name)
                                 let target   = event.target;
                                 const formData  = new FormData();
                                 for (let i = 0; i < target.length; i++) {
@@ -62,16 +57,9 @@ export default function Library({ data }: LibraryContentProps) {
                                         return response.headers.get("Location")
                                     })
                                     .then((location) => {
-                                        console.log("Event source location", location)
-                                        let eventSource = new EventSource(location)
-                                        let message = ""
-                                        eventSource.onmessage = (event) => {
-                                            let eventData = JSON.parse(event.data)
-                                            if (eventData.Type == "Part") {
-                                                message = message + eventData.Delta
-                                                setMessage(message)
-                                            }
-                                        }
+                                        let channel = location.split('/').slice(-1)[0]
+                                        console.log('Found channel', channel)
+                                        navigate('/web/' + library.Name + '/' + command.Name + '/' + channel)
                                     })
                                     .catch((err) => {
                                         console.log(err)

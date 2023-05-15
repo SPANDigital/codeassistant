@@ -28,6 +28,7 @@ import Icon from '@mui/material/Icon';
 import { BrowserRouter as Router, Routes, Route, Link as RouterLink} from "react-router-dom";
 import Landing from "./landing";
 import Library from "./library";
+import Receive from "./receive";
 
 function Copyright(props: any) {
     return (
@@ -189,6 +190,7 @@ function DashboardContent({ data }: DashboardContentProps) {
         <Routes>
            <Route path="/web" element={<Landing />} />
            <Route path="/web/:libraryName" element={<Library data={data} />} />
+           <Route path="/web/:libraryName/:commandName/:receiveChannel" element={<Receive data={data}  />} />
         </Routes>
     <Copyright sx={{ pt: 4 }} />
     </Container>

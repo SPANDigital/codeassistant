@@ -7,6 +7,7 @@ import "errors"
 type Command struct {
 	Library     *Library          `json:"-"`
 	Name        string            `yaml:"name"`
+	DisplayName string            `yaml:"display-name"`
 	Model       string            `yaml:"model"`
 	Usage       string            `yaml:"usage"`
 	Inherit     string            `yaml:"inherit"`

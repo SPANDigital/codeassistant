@@ -108,7 +108,6 @@ to quickly create a Cobra application.`,
 				uuid := uuid.New()
 				responses[uuid] = make(MessageChan)
 				go func() {
-					fmt.Fprintln(os.Stderr, "Go func started")
 					responses[uuid] <- Message{Delta: "", Type: "Start"}
 					err = chatGPT.Completion(commandInstance, func(objectType string, choice model2.Choice) {
 						if objectType == "chat.completion.chunk" && choice.Delta != nil {
@@ -116,7 +115,6 @@ to quickly create a Cobra application.`,
 						}
 					})
 					responses[uuid] <- Message{Delta: "", Type: "Done"}
-					fmt.Fprintln(os.Stderr, "Go func endedf")
 				}()
 				c.Header("Location", fmt.Sprintf("/api/receive/%s", uuid))
 				c.Status(201)
