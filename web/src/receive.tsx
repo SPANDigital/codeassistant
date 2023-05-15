@@ -5,7 +5,9 @@ import Typography from "@mui/material/Typography";
 import * as React from "react";
 import Paper from "@mui/material/Paper";
 import ReactMarkdown from "react-markdown";
-import ReceiveBody from "./receivebody";
+import {Prism as SyntaxHighlighter} from 'react-syntax-highlighter'
+import {dark} from 'react-syntax-highlighter/dist/esm/styles/prism'
+import CopyToClipboard from 'react-copy-to-clipboard';
 
 interface ReceiveContentProps {
     data: object
@@ -40,7 +42,30 @@ export default function Receive({ data }: ReceiveContentProps) {
                         { library.DisplayName } &gt; { command.DisplayName }
                     </Typography>
                     { message != "" &&
-                        <ReceiveBody content={ message}/>
+                        <ReactMarkdown children={message} components={{
+                            code({node, inline, className, children, ...props}) {
+                                const match = /language-(\w+)/.exec(className || '')
+                                return !inline && match ? (
+                                    <React.Fragment>
+                                        <CopyToClipboard text={String(children).replace(/\n$/, '')}>
+                                            <button>Copy</button>
+                                        </CopyToClipboard>
+                                        <SyntaxHighlighter
+                                            {...props}
+                                            children={String(children).replace(/\n$/, '')}
+                                            style={dark}
+                                            language={match[1]}
+                                            PreTag="div"
+                                        />
+                                    </React.Fragment>
+                                ) : (
+                                    <code {...props} className={className}>
+                                        {children}
+                                    </code>
+                                )
+                            }
+                        }}
+                        />
                     }
                 </Paper>
             </Grid>
