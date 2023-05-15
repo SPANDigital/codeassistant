@@ -7,6 +7,6 @@ type Library struct {
 	DisplayName string `yaml:"display-name"`
 	Icon        string
 	FullPath    string `json:"-"`
-	Index       string `json:"-"`
+	Index       string
 	Commands    map[string]*Command
 }

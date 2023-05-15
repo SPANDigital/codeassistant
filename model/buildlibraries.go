@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func BuildLibraries() map[string]*Library {
@@ -78,6 +79,9 @@ func BuildLibraries() map[string]*Library {
 						var command Command
 						err := yaml.Unmarshal(data, &command)
 						if err == nil {
+							if command.DisplayName == "" {
+								command.DisplayName = strings.ReplaceAll(command.Name, "-", " ")
+							}
 							command.Library = library
 							library.Commands[command.Name] = &command
 						}
