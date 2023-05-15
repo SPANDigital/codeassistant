@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import * as React from "react";
 import Paper from "@mui/material/Paper";
 import ReactMarkdown from "react-markdown";
+import ReceiveBody from "./receivebody";
 
 interface ReceiveContentProps {
     data: object
@@ -39,10 +40,10 @@ export default function Receive({ data }: ReceiveContentProps) {
                         { library.DisplayName } &gt; { command.DisplayName }
                     </Typography>
                     { message != "" &&
-                        <ReactMarkdown>{ message }</ReactMarkdown>
+                        <ReceiveBody content={ message}/>
                     }
                 </Paper>
             </Grid>
         </React.Fragment>
-    )
+    );
 }

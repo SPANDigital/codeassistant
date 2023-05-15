@@ -33,7 +33,7 @@ export default function Library({ data }: LibraryContentProps) {
                         <ReactMarkdown>{library.Index}</ReactMarkdown>
                     }
 
-                        { data && Object.values(library.Commands).map((command, index) => {
+                        { data && Object.values(library.Commands).filter((command) => !command.Abstract).map((command, index) => {
                             let handleSubmit = (event) => {
                                 event.preventDefault()
                                 let target   = event.target;

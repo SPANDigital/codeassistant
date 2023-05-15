@@ -30,6 +30,8 @@ import Landing from "./landing";
 import Library from "./library";
 import Receive from "./receive";
 
+import "./app.css";
+
 function Copyright(props: any) {
     return (
         <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -42,6 +44,7 @@ function Copyright(props: any) {
     </Typography>
 );
 }
+
 
 const drawerWidth: number = 240;
 
