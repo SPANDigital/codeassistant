@@ -21,7 +21,7 @@ var runPromptsCmd = &cobra.Command{
 	Short: "Run prompts from prompt database",
 	Long:  `Run prompts from prompt database.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		commandInstance, err := model.NewCommandInstance(args)
+		commandInstance, err := model.NewCommandInstance(true, map[string]string{}, args...)
 		if err == nil {
 			openAiApiKey := viper.GetString("openAiApiKey")
 			user := viper.GetString("userEmail")

@@ -14,10 +14,13 @@ import (
 )
 
 type CommandInstance struct {
-	Command *Command
-	Params  map[string]string
-	Prompts []Prompt
+	Command     *Command
+	Params      map[string]string
+	Prompts     []Prompt
+	EnableStdin bool
 }
+
+type TemplateFunc func() (string, error)
 
 func stdin() (string, error) {
 	data, err := io.ReadAll(os.Stdin)
@@ -27,10 +30,14 @@ func stdin() (string, error) {
 	return string(data), nil
 }
 
-func runParamTemplate(input string) (string, error) {
+func fakeStdin() (string, error) {
+	return "", nil
+}
+
+func (ci *CommandInstance) runParamTemplate(input string) (string, error) {
 
 	tmpl, err := template.New("paramTemplate").Funcs(sprig.FuncMap()).Funcs(map[string]any{
-		"stdin": stdin,
+		"stdin": (map[bool]TemplateFunc{true: stdin, false: fakeStdin})[ci.EnableStdin],
 	}).Parse(input)
 	if err != nil {
 		return "", err
@@ -56,12 +63,17 @@ func (ci *CommandInstance) runContentTemplate(content string) (string, error) {
 	return buff.String(), nil
 }
 
-func (ci *CommandInstance) buildParams(args []string) {
+func (ci *CommandInstance) buildParams(defaultParams map[string]string, args []string) {
 	params := make(map[string]string)
 	for k, v := range ci.Command.Params {
-		value, err := runParamTemplate(v)
-		if err == nil {
+		value, found := defaultParams[k]
+		if found {
 			params[k] = value
+		} else {
+			value, err := ci.runParamTemplate(v)
+			if err == nil {
+				params[k] = value
+			}
 		}
 	}
 	for _, arg := range args {
@@ -93,7 +105,24 @@ func (ci *CommandInstance) buildPrompts() ([]Prompt, error) {
 	return prompts, nil
 }
 
-func NewCommandInstance(args []string) (*CommandInstance, error) {
+func CommandInstanceParams(args ...string) ([]string, error) {
+	libraryName, commandName := args[0], args[1]
+	library, found := BuildLibraries()[libraryName]
+	if !found {
+		return nil, fmt.Errorf("library: '%s' not found", libraryName)
+	}
+	command, found := library.Commands[commandName]
+	if !found {
+		return nil, fmt.Errorf("command: '%s' not found in library: '%s", commandName, libraryName)
+	}
+	var params []string
+	for param, _ := range command.Params {
+		params = append(params, param)
+	}
+	return params, nil
+}
+
+func NewCommandInstance(enableStdin bool, defaultParams map[string]string, args ...string) (*CommandInstance, error) {
 	if len(args) < 2 {
 		return nil, errors.New("at least two arguments are required to construct a command instance")
 	}
@@ -107,9 +136,10 @@ func NewCommandInstance(args []string) (*CommandInstance, error) {
 		return nil, fmt.Errorf("command: '%s' not found in library: '%s", commandName, libraryName)
 	}
 	commandInstance := &CommandInstance{
-		Command: command,
+		EnableStdin: enableStdin,
+		Command:     command,
 	}
-	commandInstance.buildParams(args[2:])
+	commandInstance.buildParams(defaultParams, args[2:])
 	prompts, err := commandInstance.buildPrompts()
 	if err != nil {
 		return nil, err

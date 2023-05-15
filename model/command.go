@@ -7,11 +7,13 @@ import "errors"
 type Command struct {
 	Library     *Library          `json:"-"`
 	Name        string            `yaml:"name"`
+	DisplayName string            `yaml:"display-name"`
 	Model       string            `yaml:"model"`
 	Usage       string            `yaml:"usage"`
 	Inherit     string            `yaml:"inherit"`
 	Params      map[string]string `yaml:"params"`
-	Prompts     []Prompt          `yaml:"prompts"`
+	UiHints     map[string]UiHint `yaml:"ui-hints"`
+	Prompts     []Prompt          `yaml:"prompts" json:"-"`
 	Abstract    bool              `yaml:"abstract"`
 	Temperature *float32          `yaml:"temperature"`
 	TopP        *float32          `yaml:"top_p"`

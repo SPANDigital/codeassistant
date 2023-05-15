@@ -5,15 +5,30 @@ package cmd
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"github.com/spandigitial/codeassistant/client"
+	model2 "github.com/spandigitial/codeassistant/client/model"
 	"github.com/spandigitial/codeassistant/model"
 	"github.com/spandigitial/codeassistant/web"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"golang.org/x/time/rate"
+	"io"
 	"io/fs"
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
+
+type Message struct {
+	Delta string
+	Type  string
+}
+
+type MessageChan chan Message
+
+var responses = make(map[uuid.UUID]MessageChan)
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
@@ -34,16 +49,83 @@ to quickly create a Cobra application.`,
 			router := gin.Default()
 			if !debugger.IsRecording("webserver") {
 				gin.SetMode(gin.ReleaseMode)
+			} else {
+				gin.SetMode(gin.DebugMode)
 			}
 			router.GET("/", func(context *gin.Context) {
 				context.Redirect(http.StatusTemporaryRedirect, "/web")
 			})
-			router.StaticFS("/web", http.FS(dist))
+			httpFs := http.FS(dist)
+			router.StaticFS("/web", httpFs)
 			router.GET("/api/graph", func(context *gin.Context) {
 				context.JSON(http.StatusOK, libraries)
 			})
+			router.GET("/api/receive/:uuid", func(c *gin.Context) {
+				uuid, err := uuid.Parse(c.Param("uuid"))
+				if err != nil {
+					c.Error(err)
+					return
+				}
+				_, found := responses[uuid]
+				if !found {
+					c.AbortWithStatus(404)
+					return
+				}
+				c.Stream(func(w io.Writer) bool {
+					// Stream message to client from message channel
+					if msg, ok := <-responses[uuid]; ok {
+						c.SSEvent("message", msg)
+						return true
+					}
+					delete(responses, uuid)
+					return false
+				})
+			})
+			router.POST("/api/prompt/:libraryName/:commandName", func(c *gin.Context) {
+				defaultParams := make(map[string]string)
+				params, err := model.CommandInstanceParams(c.Param("libraryName"), c.Param("commandName"))
+				if err != nil {
+					c.Error(err)
+					return
+				}
+				for _, param := range params {
+					defaultParams[param] = c.PostForm(param)
+				}
+				commandInstance, err := model.NewCommandInstance(false, defaultParams, c.Param("libraryName"), c.Param("commandName"))
+				if err != nil {
+					fmt.Fprintln(os.Stderr, "Can't find command", err.Error())
+					c.Error(err)
+					return
+				}
+				openAiApiKey := viper.GetString("openAiApiKey")
+				user := viper.GetString("userEmail")
+				userAgent := viper.GetString("userAgent")
+				if userAgent == "" {
+					userAgent = "SPAN Digital codeassistant"
+				}
+				chatGPT := client.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), client.WithUser(user), client.WithUserAgent(userAgent))
 
-			router.Run(fmt.Sprintf(":%d", viper.GetInt("serverHttpPort")))
+				uuid := uuid.New()
+				responses[uuid] = make(MessageChan)
+				go func() {
+					fmt.Fprintln(os.Stderr, "Go func started")
+					responses[uuid] <- Message{Delta: "", Type: "Start"}
+					err = chatGPT.Completion(commandInstance, func(objectType string, choice model2.Choice) {
+						if objectType == "chat.completion.chunk" && choice.Delta != nil {
+							responses[uuid] <- Message{Delta: choice.Delta.Content, Type: "Part"}
+						}
+					})
+					responses[uuid] <- Message{Delta: "", Type: "Done"}
+					fmt.Fprintln(os.Stderr, "Go func endedf")
+				}()
+				c.Header("Location", fmt.Sprintf("/api/receive/%s", uuid))
+				c.Status(201)
+
+			})
+
+			port := viper.GetInt("serverHttpPort")
+			fmt.Fprintf(os.Stderr, "Visit http://0.0.0.0:%d/\n", port)
+			router.Run(fmt.Sprintf(":%d", port))
 		}
 		if err != nil {
 			fmt.Fprintf(os.Stderr, err.Error())
