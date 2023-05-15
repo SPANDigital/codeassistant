@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/gin-gonic/gin v1.9.0
-	github.com/pkoukk/tiktoken-go v0.1.1-0.20230418101013-cae809389480
+	github.com/pkoukk/tiktoken-go v0.1.1
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.15.0
 	github.com/yuin/goldmark v1.5.4
