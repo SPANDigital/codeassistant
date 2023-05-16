@@ -52,6 +52,12 @@ brew reinstall codeassistant
 
 ## Usage
 
+### Run web front-end
+
+```bash
+codeassistant serve
+```
+
 ### List all the commands in your prompt libraries
 
 ```bash

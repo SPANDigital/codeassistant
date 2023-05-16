@@ -12,6 +12,7 @@ type Command struct {
 	Usage       string            `yaml:"usage"`
 	Inherit     string            `yaml:"inherit"`
 	Params      map[string]string `yaml:"params"`
+	UiHints     map[string]UiHint `yaml:"ui-hints"`
 	Prompts     []Prompt          `yaml:"prompts" json:"-"`
 	Abstract    bool              `yaml:"abstract"`
 	Temperature *float32          `yaml:"temperature"`
