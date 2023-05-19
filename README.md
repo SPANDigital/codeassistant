@@ -1,8 +1,11 @@
 # codeassistant
 
 codeassistant automates interactions with the OpenAI Completions API (and other similar APIs in the future).
-Prompts are organized in a directory (or _prompts library_) as YAML configuration files with documentation implemented in Markdown.
+Prompts are organized in a directory (or _prompts library_) as YAML configuration files with documentation implemented
+in Markdown.
 An example of such a library can be found [here](https://github.com/SPANDigital/prompts-library).
+
+We are looking for contributors, please see how you can [contribute](CONTRIBUTING.md), and our [code of conduct](CODE_OF_CONDUCT.md).
 
 It fulfills these purposes:
 
