@@ -1,23 +1,20 @@
 # codeassistant
 
-codeassistant automates interactions with the OpenAI Completions API. 
+codeassistant automates interactions with the OpenAI Completions API (and other similar APIs in the future).
 Prompts are organized in a directory (or _prompts library_) as YAML configuration files with documentation implemented in Markdown.
 An example of such a library can be found [here](https://github.com/SPANDigital/prompts-library).
 
 It fulfills these purposes:
 
 - A tool for prompt engineers to prototype prompts, and rapidly iterate on them
-- The ability to parameterise prompts with light templating in the handling of input
+- The ability to parameterize prompts with light templating in the handling of input
+- Allows prompts to be integrated with other software such as shell scripts
+- Provides a Web UI
 
-It has two main modes of operation
+It has two main modes of operation:
 
-## CLI
-  
-  Suitable for shell scripts. Output of prompts can be redirected from STDOUT.
-
-## Web UI
-
-  Useful for testing prompts
+- CLI: Suitable for shell scripts. Output of prompts can be redirected from STDOUT.
+- WebUI: Useful for testing prompts.
 
 ## OpenAI API Key
 
