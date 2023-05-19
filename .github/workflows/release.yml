@@ -26,11 +26,11 @@ jobs:
       - name: "Install Parcel"
         run: |
           cd web
-          yarn parcel build src/index.html --public-url ./
+          yarn add --dev parcel
       - name: "Build Web with Parcel"
-        run: |        
+        run: |
           cd web
-          yarn parcel build
+          yarn parcel build src/index.html --public-url ./
       - uses: actions/setup-go@v4
         with:
           go-version: stable
