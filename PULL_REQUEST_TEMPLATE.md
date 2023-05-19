@@ -1,5 +1,6 @@
 ## Checklist
 
+- [ ]
 - [ ] Branch has been rebased with `main`
 - [ ] Commits
     - [ ] Have been properly set-up
