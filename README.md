@@ -1,5 +1,23 @@
 # codeassistant
-Use ChatGPT API to automate programming tasks
+
+codeassistant automates interactions with the OpenAI Completions API. 
+Prompts are organized in a directory (or _prompts library_) as YAML configuration files with documentation implemented in Markdown.
+An example of such a library can be found [here](https://github.com/SPANDigital/prompts-library).
+
+It fulfills these purposes:
+
+- A tool for prompt engineers to prototype prompts, and rapidly iterate on them
+- The ability to parameterise prompts with light templating in the handling of input
+
+It has two main modes of operation
+
+## CLI
+  
+  Suitable for shell scripts. Output of prompts can be redirected from STDOUT.
+
+## Web UI
+
+  Useful for testing prompts
 
 ## OpenAI API Key
 
