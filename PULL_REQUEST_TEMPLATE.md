@@ -1,5 +1,3 @@
-# Pull Request Template
-
 ## Checklist
 
 - [ ] Branch has been rebased with `main`
