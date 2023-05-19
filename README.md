@@ -1,4 +1,5 @@
 # codeassistant
+_tool for prompt engineers_
 
 codeassistant automates interactions with the OpenAI Completions API (and other similar APIs in future versions).
 Prompts are organized in a directory (or _prompts library_) as YAML configuration files with documentation implemented
