@@ -23,10 +23,10 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '18.16'
-      - name: "Install Web Dependencies"
+      - name: "Install Parcel"
         run: |
           cd web
-          yarn install
+          yarn add --dev parcel
       - name: "Build Web with Parcel"
         run: |        
           cd web
