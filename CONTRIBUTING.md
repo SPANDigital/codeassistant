@@ -23,8 +23,7 @@ rundown!
 
 1. Find an issue that you are interested in addressing or a feature that you would like to add.
 2. Fork the repository associated with the issue to your local GitHub organization. This means that you will have a copy
-   of
-   the repository under your-GitHub-username/repository-name.
+   of the repository under your-GitHub-username/repository-name.
 3. Clone the repository to your local machine using git clone https://github.com/github-username/repository-name.git.
 4. Create a new branch for your fix using git checkout -b branch-name-here.
 5. Make the appropriate changes for the issue you are trying to address or the feature that you want to add.
@@ -45,8 +44,7 @@ rundown!
 
 # Where can I go for help?
 
-If you need help, you can ask questions on our mailing list, IRC chat,
-or [list any other communication platforms that your project uses].
+If you need help, please email [richard.wooding@spandigital.com](mailto:richard.wooding@spandigital.com).
 
 # What does the Code of Conduct mean for me?
 
