@@ -2,7 +2,7 @@
 
 package model
 
-type ChatGPTResponse struct {
+type CompletionsResponse struct {
 	Id      string   `json:"id"`
 	Object  string   `json:"object"`
 	Created int      `json:"created"`

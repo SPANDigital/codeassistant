@@ -71,6 +71,67 @@ func WithUserAgent(userAgent string) Option {
 
 var dataRegex = regexp.MustCompile("data: (\\{.+\\})\\w?")
 
+func (c *ChatGPTHttpClient) Models(handlers ...ModelHandler) error {
+	url := "https://api.openai.com/v1/models"
+	requestTime := time.Now()
+
+	c.debugger.Message("request-time", fmt.Sprintf("%v", requestTime))
+
+	// Create the HTTP request
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return err
+	}
+	req.Header.Set("User-Agent", *c.userAgent)
+	req.Header.Set("Cache-Control", "no-cache")
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Authorization", "Bearer "+c.apiKey)
+
+	if c.debugger.IsRecording("request-header") {
+		var bytes bytes.Buffer
+		req.Header.Write(&bytes)
+		c.debugger.Message("request-header", bytes.String())
+	}
+
+	resp, err := c.rlHTTPClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	if c.debugger.IsRecording("response-header") {
+		var bytes bytes.Buffer
+		resp.Header.Write(&bytes)
+		c.debugger.Message("response-header", bytes.String())
+	}
+
+	responseTime := time.Now()
+	elapsed := responseTime.Sub(requestTime)
+	c.debugger.Message("first-response-time", fmt.Sprintf("%v elapsed %v", responseTime, elapsed))
+	c.debugger.Message("last-response-time", fmt.Sprintf("%v elapsed %v", responseTime, elapsed))
+
+	// Read the response body
+	responseBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+
+	// Parse the response JSON
+	var response model2.LanguageModelsResponse
+	err = json.Unmarshal(responseBytes, &response)
+	if err != nil {
+		return err
+	}
+
+	for _, languageModel := range response.Data {
+		for _, handler := range handlers {
+			handler(languageModel)
+		}
+	}
+	return nil
+}
+
 func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, handlers ...ChoiceHandler) error {
 	url := "https://api.openai.com/v1/chat/completions"
 
@@ -79,7 +140,7 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 	}
 
 	// Create the request body
-	request := model2.ChatGPTRequest{
+	request := model2.CompletionsRequest{
 		Messages: commandInstance.Prompts,
 		User:     c.user,
 		Stream:   true,
@@ -173,7 +234,7 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 		size := len(bytes)
 		if string(bytes[size-1:size]) == "\n" {
 			if len(data) > 0 && string(data[:1]) == "{" {
-				var response model2.ChatGPTResponse
+				var response model2.CompletionsResponse
 				err = json.Unmarshal(data[:read], &response)
 				if response.Error != nil {
 					return response.Error
@@ -188,7 +249,7 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 			for _, matches := range allMatches {
 
 				if len(matches) > 0 {
-					var response model2.ChatGPTResponse
+					var response model2.CompletionsResponse
 					err = json.Unmarshal(matches[1], &response)
 					if response.Error != nil {
 						return response.Error

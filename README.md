@@ -88,6 +88,13 @@ codeassistant list
 codeassistant run <library> <command> <var1:value> <vae2:value>
 ```
 
+### List available ChatGPT models (beta)
+
+```bash
+codeassistant list-models
+```
+
+
 This `README.md` file is documentation:
 
 `SPDX-License-Identifier: MIT`
