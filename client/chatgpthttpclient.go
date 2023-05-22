@@ -10,6 +10,7 @@ import (
 	model2 "github.com/spandigitial/codeassistant/client/model"
 	"github.com/spandigitial/codeassistant/model"
 	"github.com/spandigitial/codeassistant/ratelimit"
+	"github.com/spf13/viper"
 	"golang.org/x/time/rate"
 	"io"
 	"net/http"
@@ -149,7 +150,11 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 	if commandInstance.Command.Model != "" {
 		request.Model = commandInstance.Command.Model
 	} else {
-		request.Model = "gpt-3.5-turbo"
+		model := viper.GetString("defaultModel")
+		if model == "" {
+			model = "gpt-3.5-turbo"
+		}
+		request.Model = model
 	}
 	if commandInstance.Command.Temperature != nil {
 		request.Temperature = commandInstance.Command.Temperature

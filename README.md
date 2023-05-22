@@ -40,6 +40,7 @@ openAiApiKey: "<api key>"
 userEmail: "<your email address>"
 promptsLibraryDir: <directory to load prompts, defaults to $HOME/prompts-library>
 userAgent: "<use this for user agent header>"
+defaultModel: "gpt-4"
 debug:
   - configuration
   - first-response-time
@@ -76,6 +77,12 @@ brew reinstall codeassistant
 codeassistant serve
 ```
 
+or to override the defailt model
+
+```bash
+codeassistant serve --defaultModel gpt-4
+```
+
 ### List all the commands in your prompt libraries
 
 ```bash
@@ -86,6 +93,12 @@ codeassistant list
 
 ```bash
 codeassistant run <library> <command> <var1:value> <vae2:value>
+```
+
+or to override the defailt model
+
+```bash
+codeassistant run <library> <command> <var1:value> <vae2:value> --defaultModel gpt-4
 ```
 
 ### List available ChatGPT models (beta)
