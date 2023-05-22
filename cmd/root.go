@@ -54,9 +54,13 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.codeassistant.yaml)")
-	rootCmd.PersistentFlags().String("openAiApiKey", "", "openAiApiKey")
+	rootCmd.PersistentFlags().String("openAiApiKey", "", "OpenAI API Key")
 	if err := viper.BindPFlag("openAiApiKey", rootCmd.PersistentFlags().Lookup("openAiApiKey")); err != nil {
 		log.Fatal("Unable to find flag openAiApiKey", err)
+	}
+	rootCmd.PersistentFlags().String("defaultModel", "", "Model to use if not specified (defaqults to gpt=3.5-turbo)")
+	if err := viper.BindPFlag("defaultModel", rootCmd.PersistentFlags().Lookup("defaultModel")); err != nil {
+		log.Fatal("Unable to find flag defaultModel", err)
 	}
 	rootCmd.PersistentFlags().String("userEmail", "", "User to send to ChatGPT")
 	if err := viper.BindPFlag("userEmail", rootCmd.PersistentFlags().Lookup("userEmail")); err != nil {
