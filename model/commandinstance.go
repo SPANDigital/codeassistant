@@ -4,9 +4,12 @@ package model
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/Masterminds/sprig/v3"
+	"github.com/robertkrimen/otto"
+	_ "github.com/robertkrimen/otto/underscore"
 	"io"
 	"os"
 	"strings"
@@ -18,6 +21,7 @@ type CommandInstance struct {
 	Params      map[string]string
 	Prompts     []Prompt
 	EnableStdin bool
+	Data        map[string]interface{}
 }
 
 type TemplateFunc func() (string, error)
@@ -43,7 +47,7 @@ func (ci *CommandInstance) runParamTemplate(input string) (string, error) {
 		return "", err
 	}
 	buff := bytes.Buffer{}
-	err = tmpl.Execute(&buff, struct{}{})
+	err = tmpl.Execute(&buff, ci.Data)
 	if err != nil {
 		return "", err
 	}
@@ -56,7 +60,7 @@ func (ci *CommandInstance) runContentTemplate(content string) (string, error) {
 		return "", err
 	}
 	buff := bytes.Buffer{}
-	err = tmpl.Execute(&buff, ci.Params)
+	err = tmpl.Execute(&buff, ci.Data)
 	if err != nil {
 		return "", err
 	}
@@ -92,17 +96,56 @@ func (ci *CommandInstance) buildPrompts() ([]Prompt, error) {
 		return nil, err
 	}
 	for _, prompt := range allPrompts {
+		role, err := ci.runContentTemplate(prompt.Role)
 		content, err := ci.runContentTemplate(prompt.Content)
 		if err != nil {
 			return nil, err
 		}
 		prompts = append(prompts, Prompt{
-			Role:    prompt.Role,
+			Role:    role,
 			Content: content,
 		})
 
 	}
 	return prompts, nil
+}
+
+func stringArguments(call *otto.FunctionCall) []string {
+	ret := make([]string, len(call.ArgumentList))
+	for _, argument := range call.ArgumentList {
+		ret = append(ret, argument.String())
+	}
+	return ret
+}
+
+func (ci *CommandInstance) runScript() error {
+	paramsJson, err := json.Marshal(ci.Params)
+	if err != nil {
+		return err
+	}
+	dataJson, err := json.Marshal(ci.Data)
+	if err != nil {
+		return err
+	}
+	if ci.Command.Script != "" {
+		vm := otto.New()
+
+		vm.Set("addPrompt", func(call otto.FunctionCall) otto.Value {
+			ci.Prompts = append(ci.Prompts, Prompt{
+				Role:    call.Argument(0).String(),
+				Content: call.Argument(1).String(),
+			})
+			return otto.Value{}
+		})
+		_, err := vm.Run(fmt.Sprintf("var data=%s;\nvar params=%s;\n%s",
+			string(dataJson),
+			string(paramsJson),
+			ci.Command.Script))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func CommandInstanceParams(args ...string) ([]string, error) {
@@ -137,6 +180,7 @@ func NewCommandInstance(enableStdin bool, defaultParams map[string]string, args 
 	}
 	commandInstance := &CommandInstance{
 		EnableStdin: enableStdin,
+		Data:        library.Data,
 		Command:     command,
 	}
 	commandInstance.buildParams(defaultParams, args[2:])
@@ -145,6 +189,10 @@ func NewCommandInstance(enableStdin bool, defaultParams map[string]string, args 
 		return nil, err
 	}
 	commandInstance.Prompts = prompts
+	err = commandInstance.runScript()
+	if err != nil {
+		return nil, err
+	}
 
 	return commandInstance, nil
 }

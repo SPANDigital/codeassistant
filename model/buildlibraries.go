@@ -54,10 +54,12 @@ func BuildLibraries() map[string]*Library {
 	}
 
 	_ = filepath.WalkDir(promptsLibrary, func(path string, d fs.DirEntry, err error) error {
-
 		if err != nil {
 			return err
 		}
+		base := filepath.Base(path)
+		frontName := strings.Split(base, ".")[0]
+		ext := filepath.Ext(path)
 		if d.IsDir() && d.Name()[0:1] != "." {
 			_ = libraryFromDir(path)
 		} else if !d.IsDir() && d.Name() == "_index.md" {
@@ -68,23 +70,29 @@ func BuildLibraries() map[string]*Library {
 					library.Index = string(data)
 				}
 			}
-		} else if !d.IsDir() && (filepath.Ext(path) == ".yml" || filepath.Ext(path) == ".yaml") {
+		} else if !d.IsDir() && (ext == ".yml" || ext == ".yaml" || ext == ".js") {
 			library := libraryFromDir(filepath.Dir(path))
 			if library != nil {
 				data, err := os.ReadFile(path)
 				if err == nil {
-					if filepath.Base(path) == "_index.yml" {
-						_ = yaml.Unmarshal(data, &library)
-					} else {
-						var command Command
+					if base == "_index.yml" {
+						err = yaml.Unmarshal(data, &library)
+						return err
+					} else if base == "_data.yml" {
+						err = yaml.Unmarshal(data, &library.Data)
+						return err
+					} else if ext == ".yaml" || ext == ".yml" {
+						command := library.getCommand(frontName)
 						err := yaml.Unmarshal(data, &command)
-						if err == nil {
-							if command.DisplayName == "" {
-								command.DisplayName = strings.ReplaceAll(command.Name, "-", " ")
-							}
-							command.Library = library
-							library.Commands[command.Name] = &command
+						if err != nil {
+							return err
 						}
+						if command.DisplayName == "" {
+							command.DisplayName = strings.ReplaceAll(command.Name, "-", " ")
+						}
+					} else if ext == ".js" {
+						command := library.getCommand(frontName)
+						command.Script = string(data)
 					}
 				}
 			}

@@ -2,11 +2,13 @@
 
 package model
 
-import "errors"
+import (
+	"errors"
+)
 
 type Command struct {
 	Library     *Library          `json:"-"`
-	Name        string            `yaml:"name"`
+	Name        string            `yaml:"-"`
 	DisplayName string            `yaml:"display-name"`
 	Model       string            `yaml:"model"`
 	Usage       string            `yaml:"usage"`
@@ -17,6 +19,7 @@ type Command struct {
 	Abstract    bool              `yaml:"abstract"`
 	Temperature *float32          `yaml:"temperature"`
 	TopP        *float32          `yaml:"top_p"`
+	Script      string            `yaml:"-"`
 }
 
 func (c *Command) AllPrompts() ([]Prompt, error) {
