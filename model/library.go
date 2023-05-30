@@ -8,5 +8,6 @@ type Library struct {
 	Icon        string
 	FullPath    string `json:"-"`
 	Index       string
+	Data        map[string]interface{}
 	Commands    map[string]*Command
 }
