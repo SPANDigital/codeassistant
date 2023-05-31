@@ -38,7 +38,7 @@ func fakeStdin() (string, error) {
 	return "", nil
 }
 
-func (ci (CommandInstance) combineParamsData() map[string]interface{} {
+func (ci *CommandInstance) combineParamsData() map[string]interface{} {
 	combo := make(map[string]interface{})
 	for k, v := range ci.Params {
 		combo[k] = v
