@@ -38,6 +38,17 @@ func fakeStdin() (string, error) {
 	return "", nil
 }
 
+func (ci *CommandInstance) combineParamsData() map[string]interface{} {
+	combo := make(map[string]interface{})
+	for k, v := range ci.Params {
+		combo[k] = v
+	}
+	for k, v := range ci.Data {
+		combo[k] = v
+	}
+	return combo
+}
+
 func (ci *CommandInstance) runParamTemplate(input string) (string, error) {
 
 	tmpl, err := template.New("paramTemplate").Funcs(sprig.FuncMap()).Funcs(map[string]any{
@@ -47,7 +58,7 @@ func (ci *CommandInstance) runParamTemplate(input string) (string, error) {
 		return "", err
 	}
 	buff := bytes.Buffer{}
-	err = tmpl.Execute(&buff, ci.Data)
+	err = tmpl.Execute(&buff, ci.combineParamsData())
 	if err != nil {
 		return "", err
 	}
@@ -60,7 +71,7 @@ func (ci *CommandInstance) runContentTemplate(content string) (string, error) {
 		return "", err
 	}
 	buff := bytes.Buffer{}
-	err = tmpl.Execute(&buff, ci.Data)
+	err = tmpl.Execute(&buff, ci.combineParamsData())
 	if err != nil {
 		return "", err
 	}
