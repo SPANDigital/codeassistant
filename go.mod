@@ -16,6 +16,7 @@ require (
 )
 
 require (
+	cloud.google.com/go/aiplatform v1.43.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver/v3 v3.2.0 // indirect
 	github.com/bytedance/sonic v1.9.1 // indirect
