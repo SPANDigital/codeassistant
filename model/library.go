@@ -2,24 +2,37 @@
 
 package model
 
+import (
+	"path/filepath"
+	"strings"
+)
+
 type Library struct {
-	Name        string
-	DisplayName string `yaml:"display-name"`
-	Icon        string
-	FullPath    string `json:"-"`
-	Index       string
-	Data        map[string]interface{} `yaml:"-" json:"-"'`
-	Commands    map[string]*Command
+	Name           string
+	DisplayName    string `yaml:"display-name"`
+	Icon           string
+	Path           string   `json:"-"`
+	BuiltFromPaths []string `json:"-"`
+	Index          string
+	Data           map[string]interface{} `yaml:"-" json:"-"'`
+	Commands       map[string]*Command
 }
 
-func (l *Library) getCommand(commandName string) *Command {
-	command, found := l.Commands[commandName]
+func (l *Library) addBuildPath(path string) {
+	l.BuiltFromPaths = append(l.BuiltFromPaths, filepath.Base(path))
+}
+
+func (l *Library) getCommand(path string) *Command {
+	base := filepath.Base(path)
+	frontName := strings.Split(base, ".")[0]
+	command, found := l.Commands[frontName]
 	if !found {
 		command = &Command{
-			Name:    commandName,
+			Name:    frontName,
 			Library: l,
 		}
-		l.Commands[commandName] = command
+		l.Commands[frontName] = command
 	}
+	command.BuiltFromPaths = append(command.BuiltFromPaths, base)
 	return command
 }

@@ -7,19 +7,20 @@ import (
 )
 
 type Command struct {
-	Library     *Library          `json:"-"`
-	Name        string            `yaml:"-"`
-	DisplayName string            `yaml:"display-name"`
-	Model       string            `yaml:"model"`
-	Usage       string            `yaml:"usage"`
-	Inherit     string            `yaml:"inherit"`
-	Params      map[string]string `yaml:"params"`
-	UiHints     map[string]UiHint `yaml:"ui-hints"`
-	Prompts     []Prompt          `yaml:"prompts" json:"-"`
-	Abstract    bool              `yaml:"abstract"`
-	Temperature *float32          `yaml:"temperature"`
-	TopP        *float32          `yaml:"top_p"`
-	Script      string            `yaml:"-"`
+	Library        *Library          `json:"-"`
+	Name           string            `yaml:"-"`
+	DisplayName    string            `yaml:"display-name"`
+	BuiltFromPaths []string          `yaml:"-" json:"-"`
+	Model          string            `yaml:"model"`
+	Usage          string            `yaml:"usage"`
+	Inherit        string            `yaml:"inherit"`
+	Params         map[string]string `yaml:"params"`
+	UiHints        map[string]UiHint `yaml:"ui-hints"`
+	Prompts        []Prompt          `yaml:"prompts" json:"-"`
+	Abstract       bool              `yaml:"abstract"`
+	Temperature    *float32          `yaml:"temperature"`
+	TopP           *float32          `yaml:"top_p"`
+	Script         string            `yaml:"-"`
 }
 
 func (c *Command) AllPrompts() ([]Prompt, error) {
