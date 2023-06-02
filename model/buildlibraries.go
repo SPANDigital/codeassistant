@@ -43,7 +43,7 @@ func BuildLibraries() map[string]*Library {
 		} else {
 			library := &Library{
 				Name:     relPath,
-				FullPath: path,
+				Path:     path,
 				Index:    "",
 				Commands: make(map[string]*Command),
 			}
@@ -58,7 +58,6 @@ func BuildLibraries() map[string]*Library {
 			return err
 		}
 		base := filepath.Base(path)
-		frontName := strings.Split(base, ".")[0]
 		ext := filepath.Ext(path)
 		if d.IsDir() && d.Name()[0:1] != "." {
 			_ = libraryFromDir(path)
@@ -68,6 +67,7 @@ func BuildLibraries() map[string]*Library {
 				data, err := os.ReadFile(path)
 				if err == nil {
 					library.Index = string(data)
+					library.addBuildPath(path)
 				}
 			}
 		} else if !d.IsDir() && (ext == ".yml" || ext == ".yaml" || ext == ".js") {
@@ -77,12 +77,18 @@ func BuildLibraries() map[string]*Library {
 				if err == nil {
 					if base == "_index.yml" {
 						err = yaml.Unmarshal(data, &library)
+						if err != nil {
+							library.addBuildPath(path)
+						}
 						return err
 					} else if base == "_data.yml" {
 						err = yaml.Unmarshal(data, &library.Data)
+						if err != nil {
+							library.addBuildPath(path)
+						}
 						return err
 					} else if ext == ".yaml" || ext == ".yml" {
-						command := library.getCommand(frontName)
+						command := library.getCommand(path)
 						err := yaml.Unmarshal(data, &command)
 						if err != nil {
 							return err
@@ -91,7 +97,7 @@ func BuildLibraries() map[string]*Library {
 							command.DisplayName = strings.ReplaceAll(command.Name, "-", " ")
 						}
 					} else if ext == ".js" {
-						command := library.getCommand(frontName)
+						command := library.getCommand(path)
 						command.Script = string(data)
 					}
 				}
