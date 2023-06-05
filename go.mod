@@ -6,7 +6,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/uuid v1.3.0
-	github.com/pkoukk/tiktoken-go v0.1.1
+	github.com/pkoukk/tiktoken-go v0.1.2
 	github.com/robertkrimen/otto v0.2.1
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.16.0
