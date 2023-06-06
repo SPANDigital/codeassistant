@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-package client
+package openai
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/debugger"
 	model2 "github.com/spandigitial/codeassistant/client/model"
 	"github.com/spandigitial/codeassistant/model"
@@ -72,7 +73,7 @@ func WithUserAgent(userAgent string) Option {
 
 var dataRegex = regexp.MustCompile("data: (\\{.+\\})\\w?")
 
-func (c *ChatGPTHttpClient) Models(handlers ...ModelHandler) error {
+func (c *ChatGPTHttpClient) Models(handlers ...client.ModelHandler) error {
 	url := "https://api.openai.com/v1/models"
 	requestTime := time.Now()
 
@@ -133,7 +134,7 @@ func (c *ChatGPTHttpClient) Models(handlers ...ModelHandler) error {
 	return nil
 }
 
-func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, handlers ...ChoiceHandler) error {
+func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, handlers ...client.ChoiceHandler) error {
 	url := "https://api.openai.com/v1/chat/completions"
 
 	for _, prompt := range commandInstance.Prompts {
@@ -147,20 +148,20 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 		Stream:   true,
 	}
 
-	if commandInstance.Command.Model != "" {
-		request.Model = commandInstance.Command.Model
+	if commandInstance.Command.OpenAIConfig.Model != "" {
+		request.Model = commandInstance.Command.OpenAIConfig.Model
 	} else {
-		model := viper.GetString("defaultModel")
+		model := viper.GetString("defaultOpenAiModel")
 		if model == "" {
 			model = "gpt-3.5-turbo"
 		}
 		request.Model = model
 	}
-	if commandInstance.Command.Temperature != nil {
-		request.Temperature = commandInstance.Command.Temperature
+	if commandInstance.Command.OpenAIConfig.Temperature != nil {
+		request.Temperature = commandInstance.Command.OpenAIConfig.Temperature
 	}
-	if commandInstance.Command.TopP != nil {
-		request.TopP = commandInstance.Command.TopP
+	if commandInstance.Command.OpenAIConfig.TopP != nil {
+		request.TopP = commandInstance.Command.OpenAIConfig.TopP
 	}
 
 	requestBytes, err := json.Marshal(request)

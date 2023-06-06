@@ -11,15 +11,14 @@ type Command struct {
 	Name           string            `yaml:"-"`
 	DisplayName    string            `yaml:"display-name"`
 	BuiltFromPaths []string          `yaml:"-" json:"-"`
-	Model          string            `yaml:"model"`
 	Usage          string            `yaml:"usage"`
 	Inherit        string            `yaml:"inherit"`
 	Params         map[string]string `yaml:"params"`
 	UiHints        map[string]UiHint `yaml:"ui-hints"`
 	Prompts        []Prompt          `yaml:"prompts" json:"-"`
 	Abstract       bool              `yaml:"abstract"`
-	Temperature    *float32          `yaml:"temperature"`
-	TopP           *float32          `yaml:"top_p"`
+	OpenAIConfig   OpenAIConfig      `yaml:"open-ai-config"`
+	VertexAIConfig VertexAIConfig    `yaml:"vertex-ai-config"`
 	Script         string            `yaml:"-"`
 }
 

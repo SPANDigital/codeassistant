@@ -5,8 +5,8 @@ package cmd
 import (
 	"bufio"
 	"fmt"
-	"github.com/spandigitial/codeassistant/client"
 	model2 "github.com/spandigitial/codeassistant/client/model"
+	"github.com/spandigitial/codeassistant/client/openai"
 	"github.com/spandigitial/codeassistant/model"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -29,7 +29,7 @@ var runPromptsCmd = &cobra.Command{
 			if userAgent == "" {
 				userAgent = "SPAN Digital codeassistant"
 			}
-			chatGPT := client.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), client.WithUser(user), client.WithUserAgent(userAgent))
+			chatGPT := openai.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), openai.WithUser(user), openai.WithUserAgent(userAgent))
 			f := bufio.NewWriter(os.Stdout)
 			defer f.Flush()
 			err = chatGPT.Completion(commandInstance, func(objectType string, choice model2.Choice) {

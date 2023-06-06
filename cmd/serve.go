@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/spandigitial/codeassistant/client"
 	model2 "github.com/spandigitial/codeassistant/client/model"
+	"github.com/spandigitial/codeassistant/client/openai"
 	"github.com/spandigitial/codeassistant/model"
 	"github.com/spandigitial/codeassistant/web"
 	"github.com/spf13/cobra"
@@ -103,7 +103,7 @@ to quickly create a Cobra application.`,
 				if userAgent == "" {
 					userAgent = "SPAN Digital codeassistant"
 				}
-				chatGPT := client.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), client.WithUser(user), client.WithUserAgent(userAgent))
+				chatGPT := openai.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), openai.WithUser(user), openai.WithUserAgent(userAgent))
 
 				uuid := uuid.New()
 				responses[uuid] = make(MessageChan)
