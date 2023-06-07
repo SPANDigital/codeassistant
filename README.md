@@ -53,7 +53,21 @@ debug:
   - webserver
 ```
 
-## Installation
+## Installing and running via Docker
+
+```bash
+docker run --rm --name codeassistant \
+  --volume $HOME/.codeassistant.yaml:/.codeassistant.yaml:ro \
+  --volume $HOME/prompts-library:/prompts-library:ro \
+  -p8989:8989  \
+  ghcr.io/spandigital/codeassistant:latest serve
+```
+
+In this example `.codeassistant.yaml` is `$HOME/.codeassistant.yaml and`
+prompts-library and the prompts-library folder is in `$HOME/.prompts-library`
+On the docker container $HOME is defined as /
+
+## Installing an running via MacOS X
 
 ### Initial installation
 
