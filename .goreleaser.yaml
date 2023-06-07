@@ -41,10 +41,10 @@ changelog:
 
 dockers:
   - image_templates:
-      - "ghcr.io/SPANDigital/codeassistant:{{ .Tag }}"
-      - "ghcr.io/SPANDigital/codeassistant:v{{ .Major }}"
-      - "ghcr.io/SPANDigital/codeassistant:v{{ .Major }}.{{ .Minor }}"
-      - "ghcr.io/SPANDigital/codeassistant:latest"
+      - "ghcr.io/spandigital/codeassistant:{{ .Tag }}"
+      - "ghcr.io/spandigital/codeassistant:v{{ .Major }}"
+      - "ghcr.io/spandigital/codeassistant:v{{ .Major }}.{{ .Minor }}"
+      - "ghcr.io/spandigital/codeassistant:latest"
 
 release:
   github:
@@ -52,10 +52,10 @@ release:
     name: codeassistant
   footer: |
     ## Docker Images
-    - "ghcr.io/SPANDigital/codeassistant:{{ .Tag }}"
-    - "ghcr.io/SPANDigital/codeassistant:v{{ .Major }}"
-    - "ghcr.io/SPANDigital/codeassistant:v{{ .Major }}.{{ .Minor }}"
-    - "ghcr.io/SPANDigital/codeassistant:latest"        
+    - "ghcr.io/spandigital/codeassistant:{{ .Tag }}"
+    - "ghcr.io/spandigital/codeassistant:v{{ .Major }}"
+    - "ghcr.io/spandigital/codeassistant:v{{ .Major }}.{{ .Minor }}"
+    - "ghcr.io/spandigital/codeassistant:latest"        
 
 # .goreleaser.yaml
 brews:
