@@ -7,3 +7,4 @@ FROM scratch
 COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 ENTRYPOINT ["/codeassistant"]
 COPY codeassistant /
+EXPOSE 8989
