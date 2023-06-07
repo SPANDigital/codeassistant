@@ -39,6 +39,24 @@ changelog:
       - '^docs:'
       - '^test:'
 
+dockers:
+  - image_templates:
+      - "ghcr.io/SPANDigital/codeassistant:{{ .Tag }}"
+      - "ghcr.io/SPANDigital/codeassistant:v{{ .Major }}"
+      - "ghcr.io/SPANDigital/codeassistant:v{{ .Major }}.{{ .Minor }}"
+      - "ghcr.io/SPANDigital/codeassistant:latest"
+
+release:
+  github:
+    owner: SPANDigital
+    name: codeassistant
+  footer: |
+    ## Docker Images
+    - "ghcr.io/SPANDigital/codeassistant:{{ .Tag }}"
+    - "ghcr.io/SPANDigital/codeassistant:v{{ .Major }}"
+    - "ghcr.io/SPANDigital/codeassistant:v{{ .Major }}.{{ .Minor }}"
+    - "ghcr.io/SPANDigital/codeassistant:latest"        
+
 # .goreleaser.yaml
 brews:
   -
