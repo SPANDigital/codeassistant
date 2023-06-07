@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-type ChatGPTHttpClient struct {
+type OpenAiClient struct {
 	apiKey       string
 	debugger     *debugger.Debugger
 	rateLimiter  *rate.Limiter
@@ -29,10 +29,10 @@ type ChatGPTHttpClient struct {
 	userAgent    *string
 }
 
-type Option func(client *ChatGPTHttpClient)
+type Option func(client *OpenAiClient)
 
-func New(apiKey string, debugger *debugger.Debugger, rateLimiter *rate.Limiter, options ...Option) *ChatGPTHttpClient {
-	c := &ChatGPTHttpClient{
+func New(apiKey string, debugger *debugger.Debugger, rateLimiter *rate.Limiter, options ...Option) *OpenAiClient {
+	c := &OpenAiClient{
 		apiKey:      apiKey,
 		debugger:    debugger,
 		rateLimiter: rateLimiter,
@@ -54,26 +54,26 @@ func New(apiKey string, debugger *debugger.Debugger, rateLimiter *rate.Limiter, 
 }
 
 func WithHttpClient(httpClient *http.Client) Option {
-	return func(client *ChatGPTHttpClient) {
+	return func(client *OpenAiClient) {
 		client.httpClient = httpClient
 	}
 }
 
 func WithUser(user string) Option {
-	return func(client *ChatGPTHttpClient) {
+	return func(client *OpenAiClient) {
 		client.user = &user
 	}
 }
 
 func WithUserAgent(userAgent string) Option {
-	return func(client *ChatGPTHttpClient) {
+	return func(client *OpenAiClient) {
 		client.userAgent = &userAgent
 	}
 }
 
 var dataRegex = regexp.MustCompile("data: (\\{.+\\})\\w?")
 
-func (c *ChatGPTHttpClient) Models(handlers ...client.ModelHandler) error {
+func (c *OpenAiClient) Models(handlers ...client.ModelHandler) error {
 	url := "https://api.openai.com/v1/models"
 	requestTime := time.Now()
 
@@ -134,7 +134,7 @@ func (c *ChatGPTHttpClient) Models(handlers ...client.ModelHandler) error {
 	return nil
 }
 
-func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, handlers ...client.ChoiceHandler) error {
+func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, handlers ...client.ChoiceHandler) error {
 	url := "https://api.openai.com/v1/chat/completions"
 
 	for _, prompt := range commandInstance.Prompts {
