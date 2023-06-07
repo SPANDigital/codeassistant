@@ -45,10 +45,11 @@ dockers:
       - "ghcr.io/spandigital/codeassistant:v{{ .Major }}"
       - "ghcr.io/spandigital/codeassistant:v{{ .Major }}.{{ .Minor }}"
       - "ghcr.io/spandigital/codeassistant:latest"
+    dockerfile: "goreleaser.dockerfile"
 
 release:
   github:
-    owner: SPANDigital
+    owner: spandigital
     name: codeassistant
   footer: |
     ## Docker Images
