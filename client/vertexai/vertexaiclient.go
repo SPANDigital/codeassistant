@@ -87,6 +87,7 @@ func (c *VertexAiClient) Completion(commandInstance *model.CommandInstance, hand
 		return err
 	}
 	for _, prediction := range resp.Predictions {
-		prediction.
+		_, handler :=
+		}
 	}
 }

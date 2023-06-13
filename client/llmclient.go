@@ -7,10 +7,16 @@ import (
 	"github.com/spandigitial/codeassistant/model"
 )
 
-type ChoiceHandler func(objectType string, choice model2.Choice)
+type Message struct {
+	Delta string
+	Type  string
+}
+
+type MessageChan chan Message
+
 type ModelHandler func(languageModel model2.LanguageModel)
 
 type LLMClient interface {
 	Models(handlers ...ModelHandler) error
-	Completion(command *model.CommandInstance, handlers ...ChoiceHandler) error
+	Completion(command *model.CommandInstance, messages MessageChan) error
 }

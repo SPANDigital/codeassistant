@@ -21,13 +21,6 @@ import (
 	"time"
 )
 
-type Message struct {
-	Delta string
-	Type  string
-}
-
-type MessageChan chan Message
-
 var responses = make(map[uuid.UUID]MessageChan)
 
 // serveCmd represents the serve command
@@ -109,11 +102,7 @@ to quickly create a Cobra application.`,
 				responses[uuid] = make(MessageChan)
 				go func() {
 					responses[uuid] <- Message{Delta: "", Type: "Start"}
-					err = chatGPT.Completion(commandInstance, func(objectType string, choice model2.Choice) {
-						if objectType == "chat.completion.chunk" && choice.Delta != nil {
-							responses[uuid] <- Message{Delta: choice.Delta.Content, Type: "Part"}
-						}
-					})
+					err = chatGPT.Completion(commandInstance, func(objectType string, messages MessageChan);
 					responses[uuid] <- Message{Delta: "", Type: "Done"}
 				}()
 				c.Header("Location", fmt.Sprintf("/api/receive/%s", uuid))
