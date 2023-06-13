@@ -32,11 +32,11 @@ func New(projectId string, location string, debugger *debugger.Debugger, options
 	return c
 }
 
-func (c *VertexAiClient) Models(models client.ModelChan) error {
+func (c *VertexAiClient) Models(models chan<- client.LanguageModel) error {
 	return nil
 }
 
-func (c *VertexAiClient) Completion(commandInstance *model.CommandInstance, messages client.MessageChan) error {
+func (c *VertexAiClient) Completion(commandInstance *model.CommandInstance, messageParts chan<- client.MessagePart) error {
 	ctx := context.Background()
 	pc, err := aiplatform.NewPredictionClient(ctx)
 	if err != nil {
@@ -90,10 +90,10 @@ func (c *VertexAiClient) Completion(commandInstance *model.CommandInstance, mess
 	if err != nil {
 		return err
 	}
-	messages <- client.Message{Delta: "", Type: "Start"}
+	messageParts <- client.MessagePart{Delta: "", Type: "Start"}
 	for _, prediction := range resp.Predictions {
-		messages <- client.Message{Delta: prediction.GetStructValue().Fields["Content"].GetStringValue(), Type: "Part"}
+		messageParts <- client.MessagePart{Delta: prediction.GetStructValue().Fields["Content"].GetStringValue(), Type: "Part"}
 	}
-	messages <- client.Message{Delta: "", Type: "Done"}
+	messageParts <- client.MessagePart{Delta: "", Type: "Done"}
 	return nil
 }

@@ -45,7 +45,7 @@ var runPromptsCmd = &cobra.Command{
 			}
 			f := bufio.NewWriter(os.Stdout)
 			defer f.Flush()
-			messages := make(client.MessageChan)
+			messages := make(chan client.MessagePart)
 			go func() {
 				err = llmClient.Completion(commandInstance, messages)
 			}()

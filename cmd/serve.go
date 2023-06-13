@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/openai"
+	"github.com/spandigitial/codeassistant/client/vertexai"
 	"github.com/spandigitial/codeassistant/model"
 	"github.com/spandigitial/codeassistant/web"
 	"github.com/spf13/cobra"
@@ -21,7 +22,7 @@ import (
 	"time"
 )
 
-var responses = make(map[uuid.UUID]client.MessageChan)
+var responses = make(map[uuid.UUID]chan client.MessagePart)
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
@@ -90,18 +91,30 @@ to quickly create a Cobra application.`,
 					c.Error(err)
 					return
 				}
-				openAiApiKey := viper.GetString("openAiApiKey")
-				user := viper.GetString("userEmail")
-				userAgent := viper.GetString("userAgent")
-				if userAgent == "" {
-					userAgent = "SPAN Digital codeassistant"
+				backend := viper.GetString("backend")
+				if backend == "" {
+					backend = "openai"
 				}
-				chatGPT := openai.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), openai.WithUser(user), openai.WithUserAgent(userAgent))
-
+				var llmClient client.LLMClient
+				switch backend {
+				case "openai":
+					openAiApiKey := viper.GetString("openAiApiKey")
+					user := viper.GetString("userEmail")
+					userAgent := viper.GetString("userAgent")
+					if userAgent == "" {
+						userAgent = "SPAN Digital codeassistant"
+					}
+					llmClient = openai.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), openai.WithUser(user), openai.WithUserAgent(userAgent))
+				case "vertexai":
+					vertexAiProjectId := viper.GetString("vertexAiProjectId")
+					vertexAiLocation := viper.GetString("vertexAiLocation")
+					llmClient = vertexai.New(vertexAiProjectId, vertexAiLocation, debugger)
+				}
 				uuid := uuid.New()
-				responses[uuid] = make(client.MessageChan)
+				messageParts := make(chan client.MessagePart)
+				responses[uuid] = messageParts
 				go func() {
-					err = chatGPT.Completion(commandInstance, responses[uuid])
+					err = llmClient.Completion(commandInstance, messageParts)
 				}()
 				c.Header("Location", fmt.Sprintf("/api/receive/%s", uuid))
 				c.Status(201)

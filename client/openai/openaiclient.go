@@ -72,7 +72,7 @@ func WithUserAgent(userAgent string) Option {
 
 var dataRegex = regexp.MustCompile("data: (\\{.+\\})\\w?")
 
-func (c *OpenAiClient) Models(models client.ModelChan) error {
+func (c *OpenAiClient) Models(models chan<- client.LanguageModel) error {
 	url := "https://api.openai.com/v1/models"
 	requestTime := time.Now()
 
@@ -131,7 +131,7 @@ func (c *OpenAiClient) Models(models client.ModelChan) error {
 	return nil
 }
 
-func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messages client.MessageChan) error {
+func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messageParts chan<- client.MessagePart) error {
 	url := "https://api.openai.com/v1/chat/completions"
 
 	for _, prompt := range commandInstance.Prompts {
@@ -172,7 +172,7 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messag
 
 	/*
 		if c.debugger.IsRecording("request-tokens") {
-			c.debugger.Message("request-tokens", fmt.Sprintf("%d", debugger.NumTokensFromRequest(request)))
+			c.debugger.MessagePart("request-tokens", fmt.Sprintf("%d", debugger.NumTokensFromRequest(request)))
 		}
 	*/
 
@@ -215,6 +215,7 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messag
 	first := true
 
 	var buff bytes.Buffer
+	messageParts <- client.MessagePart{Delta: "", Type: "Start"}
 	for {
 		data := make([]byte, 1024)
 		read, err := resp.Body.Read(data)
@@ -260,15 +261,12 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messag
 						return response.Error
 					}
 					if err == nil {
-						messages <- client.Message{Delta: "", Type: "Start"}
 						for _, choice := range response.Choices {
 
 							if response.Object == "chat.completion.chunk" && choice.Delta != nil {
-								messages <- client.Message{Delta: choice.Delta.Content, Type: "Part"}
+								messageParts <- client.MessagePart{Delta: choice.Delta.Content, Type: "Part"}
 							}
 						}
-						messages <- client.Message{Delta: "", Type: "Done"}
-						close(messages)
 					} else {
 						return err
 					}
@@ -276,8 +274,9 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messag
 			}
 			buff.Reset()
 		}
-
 	}
+	messageParts <- client.MessagePart{Delta: "", Type: "Done"}
+	close(messageParts)
 
 	return nil
 }

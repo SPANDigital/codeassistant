@@ -31,7 +31,7 @@ var listModelsCmd = &cobra.Command{
 		chatGPT := openai.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), openai.WithUser(user), openai.WithUserAgent(userAgent))
 		f := bufio.NewWriter(os.Stdout)
 		defer f.Flush()
-		var models client.ModelChan
+		models := make(chan client.LanguageModel)
 		err := chatGPT.Models(models)
 		for model := range models {
 			fmt.Fprintln(os.Stdout, model)
