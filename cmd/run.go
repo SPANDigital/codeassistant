@@ -6,7 +6,6 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/spandigitial/codeassistant/client"
-	model2 "github.com/spandigitial/codeassistant/client/model"
 	"github.com/spandigitial/codeassistant/client/openai"
 	"github.com/spandigitial/codeassistant/client/vertexai"
 	"github.com/spandigitial/codeassistant/model"
@@ -39,16 +38,22 @@ var runPromptsCmd = &cobra.Command{
 					userAgent = "SPAN Digital codeassistant"
 				}
 				llmClient = openai.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), openai.WithUser(user), openai.WithUserAgent(userAgent))
-			case "vertexai": llmClient = vertexai.New()
+			case "vertexai":
+				vertexAiProjectId := viper.GetString("vertexAiProjectId")
+				vertexAiLocation := viper.GetString("vertexAiLocation")
+				llmClient = vertexai.New(vertexAiProjectId, vertexAiLocation, debugger)
 			}
-			 :=
 			f := bufio.NewWriter(os.Stdout)
 			defer f.Flush()
-			err = chatGPT.Completion(commandInstance, func(objectType string, choice model2.Choice) {
-				if objectType == "chat.completion.chunk" && choice.Delta != nil {
-					fmt.Fprintf(f, "%s", choice.Delta.Content)
+			messages := make(client.MessageChan)
+			go func() {
+				err = llmClient.Completion(commandInstance, messages)
+			}()
+			for message := range messages {
+				if message.Type == "Part" {
+					fmt.Fprint(f, message.Delta)
 				}
-			})
+			}
 			fmt.Fprintln(f)
 		}
 		if err != nil {

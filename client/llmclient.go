@@ -3,20 +3,22 @@
 package client
 
 import (
-	model2 "github.com/spandigitial/codeassistant/client/model"
 	"github.com/spandigitial/codeassistant/model"
 )
+
+type LanguageModel interface {
+	String() string
+}
 
 type Message struct {
 	Delta string
 	Type  string
 }
 
+type ModelChan chan LanguageModel
 type MessageChan chan Message
 
-type ModelHandler func(languageModel model2.LanguageModel)
-
 type LLMClient interface {
-	Models(handlers ...ModelHandler) error
+	Models(mdoels ModelChan) error
 	Completion(command *model.CommandInstance, messages MessageChan) error
 }

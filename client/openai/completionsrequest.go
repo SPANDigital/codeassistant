@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-package model
+package openai
 
 import (
 	"github.com/spandigitial/codeassistant/model"

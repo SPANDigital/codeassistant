@@ -1,15 +1,8 @@
 package debugger
 
-import (
-	"fmt"
-	"github.com/pkoukk/tiktoken-go"
-	"github.com/spandigitial/codeassistant/client/model"
-	"strings"
-)
-
 // Based upon: https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb
 
-func NumTokensFromRequest(request model.CompletionsRequest) (numTokens int) {
+/*func NumTokensFromRequest(request openai.CompletionsRequest) (numTokens int) {
 	tkm, err := tiktoken.EncodingForModel(request.Model)
 	if err != nil {
 		err = fmt.Errorf("EncodingForModel: %v", err)
@@ -39,4 +32,4 @@ func NumTokensFromRequest(request model.CompletionsRequest) (numTokens int) {
 
 	numTokens += 3 // Every reply is primed with <|start|>assistant<|message|>
 	return numTokens
-}
+}*/

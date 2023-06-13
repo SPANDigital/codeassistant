@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/debugger"
-	model2 "github.com/spandigitial/codeassistant/client/model"
 	"github.com/spandigitial/codeassistant/model"
 	"github.com/spandigitial/codeassistant/ratelimit"
 	"github.com/spf13/viper"
@@ -73,7 +72,7 @@ func WithUserAgent(userAgent string) Option {
 
 var dataRegex = regexp.MustCompile("data: (\\{.+\\})\\w?")
 
-func (c *OpenAiClient) Models(handlers ...client.ModelHandler) error {
+func (c *OpenAiClient) Models(models client.ModelChan) error {
 	url := "https://api.openai.com/v1/models"
 	requestTime := time.Now()
 
@@ -120,21 +119,19 @@ func (c *OpenAiClient) Models(handlers ...client.ModelHandler) error {
 	}
 
 	// Parse the response JSON
-	var response model2.LanguageModelsResponse
+	var response LanguageModelsResponse
 	err = json.Unmarshal(responseBytes, &response)
 	if err != nil {
 		return err
 	}
 
 	for _, languageModel := range response.Data {
-		for _, handler := range handlers {
-			handler(languageModel)
-		}
+		models <- languageModel
 	}
 	return nil
 }
 
-func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, handlers ...client.ChoiceHandler) error {
+func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messages client.MessageChan) error {
 	url := "https://api.openai.com/v1/chat/completions"
 
 	for _, prompt := range commandInstance.Prompts {
@@ -142,7 +139,7 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, handle
 	}
 
 	// Create the request body
-	request := model2.CompletionsRequest{
+	request := CompletionsRequest{
 		Messages: commandInstance.Prompts,
 		User:     c.user,
 		Stream:   true,
@@ -173,9 +170,11 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, handle
 		c.debugger.Message("request-payload", string(requestBytes))
 	}
 
-	if c.debugger.IsRecording("request-tokens") {
-		c.debugger.Message("request-tokens", fmt.Sprintf("%d", debugger.NumTokensFromRequest(request)))
-	}
+	/*
+		if c.debugger.IsRecording("request-tokens") {
+			c.debugger.Message("request-tokens", fmt.Sprintf("%d", debugger.NumTokensFromRequest(request)))
+		}
+	*/
 
 	requestTime := time.Now()
 
@@ -240,7 +239,7 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, handle
 		size := len(bytes)
 		if string(bytes[size-1:size]) == "\n" {
 			if len(data) > 0 && string(data[:1]) == "{" {
-				var response model2.CompletionsResponse
+				var response CompletionsResponse
 				err = json.Unmarshal(data[:read], &response)
 				if response.Error != nil {
 					return response.Error
@@ -255,17 +254,21 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, handle
 			for _, matches := range allMatches {
 
 				if len(matches) > 0 {
-					var response model2.CompletionsResponse
+					var response CompletionsResponse
 					err = json.Unmarshal(matches[1], &response)
 					if response.Error != nil {
 						return response.Error
 					}
 					if err == nil {
+						messages <- client.Message{Delta: "", Type: "Start"}
 						for _, choice := range response.Choices {
-							for _, handler := range handlers {
-								handler(response.Object, choice)
+
+							if response.Object == "chat.completion.chunk" && choice.Delta != nil {
+								messages <- client.Message{Delta: choice.Delta.Content, Type: "Part"}
 							}
 						}
+						messages <- client.Message{Delta: "", Type: "Done"}
+						close(messages)
 					} else {
 						return err
 					}

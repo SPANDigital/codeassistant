@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-package model
+package openai
 
 type CompletionsResponse struct {
 	Id      string   `json:"id"`

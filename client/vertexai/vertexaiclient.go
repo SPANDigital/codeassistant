@@ -32,7 +32,7 @@ func New(projectId string, location string, debugger *debugger.Debugger, options
 	return c
 }
 
-func (c *VertexAiClient) Completion(commandInstance *model.CommandInstance, handlers ...client.ChoiceHandler) error {
+func (c *VertexAiClient) Completion(commandInstance *model.CommandInstance, messages client.MessageChan) error {
 	ctx := context.Background()
 	pc, err := aiplatform.NewPredictionClient(ctx)
 	if err != nil {
@@ -86,8 +86,10 @@ func (c *VertexAiClient) Completion(commandInstance *model.CommandInstance, hand
 	if err != nil {
 		return err
 	}
+	messages <- client.Message{Delta: "", Type: "Start"}
 	for _, prediction := range resp.Predictions {
-		_, handler :=
-		}
+		messages <- client.Message{Delta: prediction.GetStructValue().Fields["Content"].GetStringValue(), Type: "Part"}
 	}
+	messages <- client.Message{Delta: "", Type: "Done"}
+	return nil
 }

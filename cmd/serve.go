@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	model2 "github.com/spandigitial/codeassistant/client/model"
+	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/openai"
 	"github.com/spandigitial/codeassistant/model"
 	"github.com/spandigitial/codeassistant/web"
@@ -21,7 +21,7 @@ import (
 	"time"
 )
 
-var responses = make(map[uuid.UUID]MessageChan)
+var responses = make(map[uuid.UUID]client.MessageChan)
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
@@ -99,11 +99,9 @@ to quickly create a Cobra application.`,
 				chatGPT := openai.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), openai.WithUser(user), openai.WithUserAgent(userAgent))
 
 				uuid := uuid.New()
-				responses[uuid] = make(MessageChan)
+				responses[uuid] = make(client.MessageChan)
 				go func() {
-					responses[uuid] <- Message{Delta: "", Type: "Start"}
-					err = chatGPT.Completion(commandInstance, func(objectType string, messages MessageChan);
-					responses[uuid] <- Message{Delta: "", Type: "Done"}
+					err = chatGPT.Completion(commandInstance, responses[uuid])
 				}()
 				c.Header("Location", fmt.Sprintf("/api/receive/%s", uuid))
 				c.Status(201)
