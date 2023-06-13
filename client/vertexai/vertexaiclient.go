@@ -32,6 +32,10 @@ func New(projectId string, location string, debugger *debugger.Debugger, options
 	return c
 }
 
+func (c *VertexAiClient) Models(models client.ModelChan) error {
+	return nil
+}
+
 func (c *VertexAiClient) Completion(commandInstance *model.CommandInstance, messages client.MessageChan) error {
 	ctx := context.Background()
 	pc, err := aiplatform.NewPredictionClient(ctx)
