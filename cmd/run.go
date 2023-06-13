@@ -5,8 +5,10 @@ package cmd
 import (
 	"bufio"
 	"fmt"
+	"github.com/spandigitial/codeassistant/client"
 	model2 "github.com/spandigitial/codeassistant/client/model"
 	"github.com/spandigitial/codeassistant/client/openai"
+	"github.com/spandigitial/codeassistant/client/vertexai"
 	"github.com/spandigitial/codeassistant/model"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -23,13 +25,23 @@ var runPromptsCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		commandInstance, err := model.NewCommandInstance(true, map[string]string{}, args...)
 		if err == nil {
-			openAiApiKey := viper.GetString("openAiApiKey")
-			user := viper.GetString("userEmail")
-			userAgent := viper.GetString("userAgent")
-			if userAgent == "" {
-				userAgent = "SPAN Digital codeassistant"
+			backend := viper.GetString("backend")
+			if backend == "" {
+				backend = "openai"
 			}
-			chatGPT := openai.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), openai.WithUser(user), openai.WithUserAgent(userAgent))
+			var llmClient client.LLMClient
+			switch backend {
+			case "openai":
+				openAiApiKey := viper.GetString("openAiApiKey")
+				user := viper.GetString("userEmail")
+				userAgent := viper.GetString("userAgent")
+				if userAgent == "" {
+					userAgent = "SPAN Digital codeassistant"
+				}
+				llmClient = openai.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), openai.WithUser(user), openai.WithUserAgent(userAgent))
+			case "vertexai": llmClient = vertexai.New()
+			}
+			 :=
 			f := bufio.NewWriter(os.Stdout)
 			defer f.Flush()
 			err = chatGPT.Completion(commandInstance, func(objectType string, choice model2.Choice) {

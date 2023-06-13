@@ -62,9 +62,9 @@ func init() {
 	if err := viper.BindPFlag("defaultOpenAiModel", rootCmd.PersistentFlags().Lookup("defaultOpenAiModel")); err != nil {
 		log.Fatal("Unable to find flag defaultOpenAiModel", err)
 	}
-	rootCmd.PersistentFlags().String("vertexAiApiKey", "", "Vertex API Key")
-	if err := viper.BindPFlag("vertexAiApiKey", rootCmd.PersistentFlags().Lookup("vertexAiApiKey")); err != nil {
-		log.Fatal("Unable to find flag vertexAiApiKey", err)
+	rootCmd.PersistentFlags().String("vertexAiProjectId", "", "Vertex Project ID")
+	if err := viper.BindPFlag("vertexAiProjectId", rootCmd.PersistentFlags().Lookup("vertexAiProjectId")); err != nil {
+		log.Fatal("Unable to find flag vertexAiProjectId", err)
 	}
 	rootCmd.PersistentFlags().String("defaultVertexAiModel", "", "Model to use if not specified (defaqults to text-bison@001")
 	if err := viper.BindPFlag("defaultVertexAiModel", rootCmd.PersistentFlags().Lookup("defaultVertexAiModel")); err != nil {
@@ -90,7 +90,10 @@ func init() {
 	if err := viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug")); err != nil {
 		log.Fatal("Unable to find flag debugDetails", err)
 	}
-
+	rootCmd.PersistentFlags().String("backend", "", "backend openai or vertexai (default is openai)")
+	if err := viper.BindPFlag("backend", rootCmd.PersistentFlags().Lookup("backend")); err != nil {
+		log.Fatal("Unable to find flag backend", err)
+	}
 }
 
 // initConfig reads in config file and ENV variables if set.

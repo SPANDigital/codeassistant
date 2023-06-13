@@ -11,6 +11,6 @@ type ChoiceHandler func(objectType string, choice model2.Choice)
 type ModelHandler func(languageModel model2.LanguageModel)
 
 type LLMClient interface {
-	ListModels(handlers ...model2.LanguageModel) error
+	Models(handlers ...ModelHandler) error
 	Completion(command *model.CommandInstance, handlers ...ChoiceHandler) error
 }

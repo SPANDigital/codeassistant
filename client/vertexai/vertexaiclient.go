@@ -2,7 +2,6 @@ package vertexai
 
 import (
 	aiplatform "cloud.google.com/go/aiplatform/apiv1"
-	"cloud.google.com/go/aiplatform/apiv1/aiplatformb"
 	"cloud.google.com/go/aiplatform/apiv1/aiplatformpb"
 	"context"
 	"fmt"
@@ -13,18 +12,18 @@ import (
 )
 
 type VertexAiClient struct {
-	apiKey   string
-	location string
-	debugger *debugger.Debugger
+	projectId string
+	location  string
+	debugger  *debugger.Debugger
 }
 
 type Option func(client *VertexAiClient)
 
-func New(apiKey string, location string, debugger *debugger.Debugger, options ...Option) *VertexAiClient {
+func New(projectId string, location string, debugger *debugger.Debugger, options ...Option) *VertexAiClient {
 	c := &VertexAiClient{
-		apiKey:   apiKey,
-		location: location,
-		debugger: debugger.
+		projectId: projectId,
+		location:  location,
+		debugger:  debugger,
 	}
 
 	for _, option := range options {
@@ -41,21 +40,41 @@ func (c *VertexAiClient) Completion(commandInstance *model.CommandInstance, hand
 	}
 	defer pc.Close()
 
-	parameters, err := structpb.NewValue(map[string]interface{}{
+	temperature := float32(0.2)
+	if commandInstance.Command.VertexAIConfig.Temperature != nil {
+		temperature = *commandInstance.Command.VertexAIConfig.Temperature
 	}
+	maxOutputTokens := 256
+	if commandInstance.Command.VertexAIConfig.MaxOutputTokens != nil {
+		maxOutputTokens = *commandInstance.Command.VertexAIConfig.MaxOutputTokens
+	}
+	topP := float32(0.8)
+	if commandInstance.Command.VertexAIConfig.TopP != nil {
+		topP = *commandInstance.Command.VertexAIConfig.TopP
+	}
+	topK := 40
+	if commandInstance.Command.VertexAIConfig.TopK != nil {
+		topK = *commandInstance.Command.VertexAIConfig.TopK
+	}
+
+	parameters, err := structpb.NewValue(map[string]interface{}{
+		"temperature":     temperature,
+		"maxOutputTokens": maxOutputTokens,
+		"topP":            topP,
+		"topK":            topK,
+	})
 	if err != nil {
 		return err
 	}
 	instances := make([]*structpb.Value, len(commandInstance.Prompts))
-    for idx, prompt := range commandInstance.Prompts {
+	for idx, prompt := range commandInstance.Prompts {
 		instances[idx], err = structpb.NewValue(map[string]interface{}{
 			"content": prompt.Content,
-		}
+		})
 		if err != nil {
 			return err
 		}
 	}
-
 
 	req := &aiplatformpb.PredictRequest{
 		Endpoint:   fmt.Sprintf("%s-aiplatform.googleapis.com:443", c.location),
@@ -63,15 +82,11 @@ func (c *VertexAiClient) Completion(commandInstance *model.CommandInstance, hand
 		Parameters: parameters,
 	}
 
-
-	op, err := aic.CreateDataset(ctx, req)
+	resp, err := pc.Predict(ctx, req)
 	if err != nil {
 		return err
 	}
-
-	resp, err := op.Wait(ctx)
-	if err != nil {
-		return err
+	for _, prediction := range resp.Predictions {
+		prediction.
 	}
-
 }
