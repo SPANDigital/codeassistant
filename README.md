@@ -131,7 +131,7 @@ or to override the default model
 codeassistant run <library> <command> <var1:value> <vae2:value> --defaultModel gpt-4
 ```
 
-### List available ChatGPT models (beta)
+### List available  models (beta)
 
 ```bash
 codeassistant list-models
