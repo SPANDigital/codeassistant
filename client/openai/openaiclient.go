@@ -141,7 +141,7 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messag
 	if commandInstance.Command.OpenAIConfig.Model != "" {
 		request.Model = commandInstance.Command.OpenAIConfig.Model
 	} else {
-		model := viper.GetString("defaultOpenAiModel")
+		model := viper.GetString("openAiModel")
 		if model == "" {
 			model = "gpt-3.5-turbo"
 		}

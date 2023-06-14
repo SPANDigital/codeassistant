@@ -15,18 +15,9 @@ func BuildLibraries() map[string]*Library {
 
 	libraries := make(map[string]*Library)
 
-	var promptsLibrary string
-	if viper.GetString("promptsLibraryDir") == "" {
-
-		// Find home directory.
-		home, err := os.UserHomeDir()
-		if err != nil {
-			return libraries
-		}
-
-		promptsLibrary = filepath.Join(home, "prompts-library")
-	} else {
-		promptsLibrary = viper.GetString("promptsLibraryDir")
+	promptsLibrary := viper.GetString("promptsLibraryDir")
+	if promptsLibrary == "" {
+		return libraries
 	}
 
 	libraryFromDir := func(path string) *Library {

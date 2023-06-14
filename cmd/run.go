@@ -30,7 +30,7 @@ var runPromptsCmd = &cobra.Command{
 			switch backend {
 			case "openai":
 				openAiApiKey := viper.GetString("openAiApiKey")
-				user := viper.GetString("userEmail")
+				user := viper.GetString("openAiUserId")
 				userAgent := viper.GetString("userAgent")
 				if userAgent == "" {
 					userAgent = "SPAN Digital codeassistant"

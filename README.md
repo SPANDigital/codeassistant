@@ -19,28 +19,41 @@ It has two main modes of operation:
 - CLI: Suitable for shell scripts. Output of prompts can be redirected from STDOUT.
 - WebUI: Useful for testing prompts.
 
-## OpenAI API Key
+## OpenAI Configuration
 
 You will need to configure an OpenAI API Key before usage.
 
-## Default values
+### Sample configuration
 
 It is recommended you set up `codeassistant` with a config file at `$HOME/.codeassistant.yaml` for default values:
 
 ```yaml
+backend: openai
 openAiApiKey: "<api key>"
-userEmail: "<your email address>"
+openAiUserId: "<your email address>"
 promptsLibraryDir: <directory to load prompts, defaults to $HOME/prompts-library>
 ```
 
-More complex configurations are possible:
+## VertexAI Configuration
+
+You will need to install the gcloud sdk before using VertexAI.
+You will need a project on Google Cloud which gives your user access to Vertex AI.
+
+### Sample configuration
 
 ```yaml
-openAiApiKey: "<api key>"
-userEmail: "<your email address>"
+backend: vertexai
+vertexAiProjectId: "<project-id>"
+vertexAiLocation: "us-central1"
+vertexAiModel: "text-bison@001"
 promptsLibraryDir: <directory to load prompts, defaults to $HOME/prompts-library>
-userAgent: "<use this for user agent header>"
-defaultModel: "gpt-4"
+```
+
+## Additional configuration
+
+More keys are available for debugging
+
+```yaml
 debug:
   - configuration
   - first-response-time

@@ -1,12 +1,13 @@
 package vertexai
 
 import (
+	"github.com/spf13/viper"
 	"os/exec"
 	"strings"
 )
 
 func generateAccessToken() (string, error) {
-	out, err := exec.Command("/Users/richardwooding/Downloads/google-cloud-sdk/bin/gcloud", "auth", "print-access-token").Output()
+	out, err := exec.Command(viper.GetString("gcloudBinary"), "auth", "print-access-token").Output()
 	if err != nil {
 		return "", err
 	}

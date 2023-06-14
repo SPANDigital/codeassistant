@@ -20,7 +20,7 @@ var listModelsCmd = &cobra.Command{
 	Long:  `list-models`,
 	Run: func(cmd *cobra.Command, args []string) {
 		openAiApiKey := viper.GetString("openAiApiKey")
-		user := viper.GetString("userEmail")
+		user := viper.GetString("openAiUserId")
 		userAgent := viper.GetString("userAgent")
 		if userAgent == "" {
 			userAgent = "SPAN Digital codeassistant"
