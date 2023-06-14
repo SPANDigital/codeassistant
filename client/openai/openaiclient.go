@@ -81,24 +81,12 @@ func (c *OpenAiClient) Models(models chan<- client.LanguageModel) error {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", "Bearer "+c.apiKey)
 
-	if c.debugger.IsRecording("request-header") {
-		var bytes bytes.Buffer
-		req.Header.Write(&bytes)
-		c.debugger.Message("request-header", bytes.String())
-	}
-
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
 	}
 
 	defer resp.Body.Close()
-
-	if c.debugger.IsRecording("response-header") {
-		var bytes bytes.Buffer
-		resp.Header.Write(&bytes)
-		c.debugger.Message("response-header", bytes.String())
-	}
 
 	responseTime := time.Now()
 	elapsed := responseTime.Sub(requestTime)
@@ -185,22 +173,10 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messag
 	req.Header.Set("Connection", "keep-alive")
 	req.Header.Set("Authorization", "Bearer "+c.apiKey)
 
-	if c.debugger.IsRecording("request-header") {
-		var bytes bytes.Buffer
-		req.Header.Write(&bytes)
-		c.debugger.Message("request-header", bytes.String())
-	}
-
 	// Send the HTTP request]
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
-	}
-
-	if c.debugger.IsRecording("response-header") {
-		var bytes bytes.Buffer
-		resp.Header.Write(&bytes)
-		c.debugger.Message("response-header", bytes.String())
 	}
 
 	defer resp.Body.Close()

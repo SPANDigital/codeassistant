@@ -9,6 +9,7 @@ import (
 	"github.com/spandigitial/codeassistant/model"
 	"io"
 	"net/http"
+	"time"
 )
 
 type Client struct {
@@ -80,6 +81,8 @@ func (c *Client) Completion(commandInstance *model.CommandInstance, messageParts
 		Parameters: parameters,
 	}
 
+	c.debugger.Message("sent-prompt", request.Instances[0].Content)
+
 	requestBytes, err := json.Marshal(request)
 	if err != nil {
 		panic(err)
@@ -91,6 +94,8 @@ func (c *Client) Completion(commandInstance *model.CommandInstance, messageParts
 		c.location,
 		c.model)
 
+	c.debugger.Message("request-time", fmt.Sprintf("%v", time.Now()))
+
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBytes))
 	if err != nil {
 		return err
@@ -100,11 +105,16 @@ func (c *Client) Completion(commandInstance *model.CommandInstance, messageParts
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.accessToken))
 
+	requestTime := time.Now()
 	// Send the HTTP request]
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
 	}
+
+	firstResponseTime := time.Now()
+	c.debugger.Message("first-response-time", fmt.Sprintf("%v elapsed %v", firstResponseTime, firstResponseTime.Sub(requestTime)))
+	c.debugger.Message("last-response-time", fmt.Sprintf("%v elapsed %v", firstResponseTime, firstResponseTime.Sub(requestTime)))
 
 	// Read the response body
 	responseBytes, err := io.ReadAll(resp.Body)

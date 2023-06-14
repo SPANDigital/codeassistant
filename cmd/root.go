@@ -78,6 +78,9 @@ func init() {
 		gcloudBinary = found
 	}
 	rootCmd.PersistentFlags().String("gcloudBinary", gcloudBinary, "Gcloud Binary")
+	if err := viper.BindPFlag("gcloudBinary", rootCmd.PersistentFlags().Lookup("gcloudBinary")); err != nil {
+		log.Fatal("Unable to find flag gcloudBinary", err)
+	}
 	rootCmd.PersistentFlags().String("vertexAiProjectId", "", "Vertex Project ID")
 	if err := viper.BindPFlag("vertexAiProjectId", rootCmd.PersistentFlags().Lookup("vertexAiProjectId")); err != nil {
 		log.Fatal("Unable to find flag vertexAiProjectId", err)
