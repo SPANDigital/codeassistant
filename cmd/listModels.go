@@ -33,7 +33,7 @@ var listModelsCmd = &cobra.Command{
 		for model := range models {
 			fmt.Fprintln(os.Stdout, model)
 		}
-		/*func(languageModel openai.LanguageModel) {
+		/*func(languageModel openai.languageModel) {
 
 		})*/
 		if err != nil {

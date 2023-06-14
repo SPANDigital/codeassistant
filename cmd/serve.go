@@ -106,7 +106,8 @@ to quickly create a Cobra application.`,
 				case "vertexai":
 					vertexAiProjectId := viper.GetString("vertexAiProjectId")
 					vertexAiLocation := viper.GetString("vertexAiLocation")
-					llmClient = vertexai.New(vertexAiProjectId, vertexAiLocation, debugger)
+					vertexAiModel := viper.GetString("vertexAiModel")
+					llmClient = vertexai.New(vertexAiProjectId, vertexAiLocation, vertexAiModel, debugger)
 				}
 				uuid := uuid.New()
 				messageParts := make(chan client.MessagePart)

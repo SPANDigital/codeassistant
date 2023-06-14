@@ -2,8 +2,8 @@ package model
 
 type VertexAIConfig struct {
 	Model           string   `yaml:"model"`
-	Temperature     *float32 `yaml:"temperature"`
+	Temperature     *float64 `yaml:"temperature"`
 	MaxOutputTokens *int     `yaml:"max-output-tokens"`
 	TopK            *int     `yaml:"top-k"`
-	TopP            *float32 `yaml:"top-p"`
+	TopP            *float64 `yaml:"top-p"`
 }

@@ -4,13 +4,13 @@ package openai
 
 import "github.com/spandigitial/codeassistant/model"
 
-type Choice struct {
-	Delta        *Delta        `json:"delta"`
+type choice struct {
+	Delta        *delta        `json:"delta"`
 	Message      *model.Prompt `json:"message"`
 	FinishReason string        `json:"finish_reason"`
 	Index        int           `json:"index"`
 }
 
-func (c Choice) String() string {
+func (c choice) String() string {
 	return c.Message.Content
 }

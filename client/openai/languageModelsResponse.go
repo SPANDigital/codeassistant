@@ -1,5 +1,5 @@
 package openai
 
-type LanguageModelsResponse struct {
-	Data []LanguageModel `json:"data"`
+type languageModelsResponse struct {
+	Data []languageModel `json:"data"`
 }

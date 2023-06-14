@@ -39,7 +39,8 @@ var runPromptsCmd = &cobra.Command{
 			case "vertexai":
 				vertexAiProjectId := viper.GetString("vertexAiProjectId")
 				vertexAiLocation := viper.GetString("vertexAiLocation")
-				llmClient = vertexai.New(vertexAiProjectId, vertexAiLocation, debugger)
+				vertexAiModel := viper.GetString("vertexAiModel")
+				llmClient = vertexai.New(vertexAiProjectId, vertexAiLocation, vertexAiModel, debugger)
 			}
 			f := bufio.NewWriter(os.Stdout)
 			defer f.Flush()

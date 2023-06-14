@@ -112,7 +112,7 @@ func (c *OpenAiClient) Models(models chan<- client.LanguageModel) error {
 	}
 
 	// Parse the response JSON
-	var response LanguageModelsResponse
+	var response languageModelsResponse
 	err = json.Unmarshal(responseBytes, &response)
 	if err != nil {
 		return err
@@ -132,7 +132,7 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messag
 	}
 
 	// Create the request body
-	request := CompletionsRequest{
+	request := completionsRequest{
 		Messages: commandInstance.Prompts,
 		User:     c.user,
 		Stream:   true,
@@ -233,7 +233,7 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messag
 		size := len(bytes)
 		if string(bytes[size-1:size]) == "\n" {
 			if len(data) > 0 && string(data[:1]) == "{" {
-				var response CompletionsResponse
+				var response completionsResponse
 				err = json.Unmarshal(data[:read], &response)
 				if response.Error != nil {
 					return response.Error
@@ -248,7 +248,7 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messag
 			for _, matches := range allMatches {
 
 				if len(matches) > 0 {
-					var response CompletionsResponse
+					var response completionsResponse
 					err = json.Unmarshal(matches[1], &response)
 					if response.Error != nil {
 						return response.Error

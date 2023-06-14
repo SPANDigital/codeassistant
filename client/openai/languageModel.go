@@ -2,11 +2,11 @@ package openai
 
 import "fmt"
 
-type LanguageModel struct {
+type languageModel struct {
 	Id      string `json:"id"`
 	OwnedBy string `json:"owned_by"`
 }
 
-func (lm LanguageModel) String() string {
+func (lm languageModel) String() string {
 	return fmt.Sprintf("Id -> %s OwnedBy -> %s\n", lm.Id, lm.OwnedBy)
 }
