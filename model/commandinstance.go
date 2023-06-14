@@ -207,3 +207,11 @@ func NewCommandInstance(enableStdin bool, defaultParams map[string]string, args 
 
 	return commandInstance, nil
 }
+
+func (ci *CommandInstance) JoinedPromptsContent(sep string) string {
+	contents := make([]string, len(ci.Prompts))
+	for idx, prompt := range ci.Prompts {
+		contents[idx] = strings.TrimSpace(prompt.Content)
+	}
+	return strings.Join(contents, sep)
+}

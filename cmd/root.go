@@ -7,6 +7,9 @@ import (
 	debugger2 "github.com/spandigitial/codeassistant/client/debugger"
 	"log"
 	"os"
+	"os/exec"
+	"os/user"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -58,19 +61,49 @@ func init() {
 	if err := viper.BindPFlag("openAiApiKey", rootCmd.PersistentFlags().Lookup("openAiApiKey")); err != nil {
 		log.Fatal("Unable to find flag openAiApiKey", err)
 	}
-	rootCmd.PersistentFlags().String("defaultModel", "", "Model to use if not specified (defaqults to gpt=3.5-turbo)")
-	if err := viper.BindPFlag("defaultModel", rootCmd.PersistentFlags().Lookup("defaultModel")); err != nil {
-		log.Fatal("Unable to find flag defaultModel", err)
+	userId := ""
+	if found, err := user.Current(); err == nil {
+		userId = found.Username
 	}
-	rootCmd.PersistentFlags().String("userEmail", "", "User to send to ChatGPT")
-	if err := viper.BindPFlag("userEmail", rootCmd.PersistentFlags().Lookup("userEmail")); err != nil {
+	rootCmd.PersistentFlags().String("openAiUserId", userId, "User to send to OpenAI")
+	if err := viper.BindPFlag("openAiUserId", rootCmd.PersistentFlags().Lookup("openAiUserId")); err != nil {
 		log.Fatal("Unable to find flag userEmail", err)
 	}
-	rootCmd.PersistentFlags().String("promptsLibraryDir", "", "Prompt library Dir")
+	rootCmd.PersistentFlags().String("openAiModel", "gpt-3.5-turbo", "Model to use if not specified")
+	if err := viper.BindPFlag("openAiModel", rootCmd.PersistentFlags().Lookup("openAiModel")); err != nil {
+		log.Fatal("Unable to find flag openAiModel", err)
+	}
+	var gcloudBinary = "gcloud"
+	if found, err := exec.LookPath("gcloud"); err == nil {
+		gcloudBinary = found
+	}
+	rootCmd.PersistentFlags().String("gcloudBinary", gcloudBinary, "Gcloud Binary")
+	if err := viper.BindPFlag("gcloudBinary", rootCmd.PersistentFlags().Lookup("gcloudBinary")); err != nil {
+		log.Fatal("Unable to find flag gcloudBinary", err)
+	}
+	rootCmd.PersistentFlags().String("vertexAiProjectId", "", "Vertex Project ID")
+	if err := viper.BindPFlag("vertexAiProjectId", rootCmd.PersistentFlags().Lookup("vertexAiProjectId")); err != nil {
+		log.Fatal("Unable to find flag vertexAiProjectId", err)
+	}
+	rootCmd.PersistentFlags().String("vertexAiModel", "text-bison@001", "Model to use if not specified")
+	if err := viper.BindPFlag("vertexAiModel", rootCmd.PersistentFlags().Lookup("vertexAiModel")); err != nil {
+		log.Fatal("Unable to find flag vertexAiModel", err)
+	}
+	rootCmd.PersistentFlags().String("vertexAiLocation", "us-central1", "Locstion to use if not specified")
+	if err := viper.BindPFlag("vertexAiLocation", rootCmd.PersistentFlags().Lookup("vertexAiLocation")); err != nil {
+		log.Fatal("Unable to find flag vertexAiLocation", err)
+	}
+	// Find home directory.
+	promptsLibraryDir := ""
+	home, err := os.UserHomeDir()
+	if err == nil {
+		promptsLibraryDir = filepath.Join(home, "prompts-library")
+	}
+	rootCmd.PersistentFlags().String("promptsLibraryDir", promptsLibraryDir, "Promptsgit library Dir")
 	if err := viper.BindPFlag("promptsLibraryDir", rootCmd.PersistentFlags().Lookup("promptsLibraryDir")); err != nil {
 		log.Fatal("Unable to find flag promptsLibraryDir", err)
 	}
-	rootCmd.PersistentFlags().String("userAgent", "", "HTTP User-Agent (default is SPANDigital codeassistant)")
+	rootCmd.PersistentFlags().String("userAgent", "SPANDigital codeassistant", "HTTP User-Agent")
 	if err := viper.BindPFlag("userAgent", rootCmd.PersistentFlags().Lookup("userAgent")); err != nil {
 		log.Fatal("Unable to find flag userAgent", err)
 	}
@@ -78,7 +111,10 @@ func init() {
 	if err := viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug")); err != nil {
 		log.Fatal("Unable to find flag debugDetails", err)
 	}
-
+	rootCmd.PersistentFlags().String("backend", "openai", "backend openai or vertexai")
+	if err := viper.BindPFlag("backend", rootCmd.PersistentFlags().Lookup("backend")); err != nil {
+		log.Fatal("Unable to find flag backend", err)
+	}
 }
 
 // initConfig reads in config file and ENV variables if set.

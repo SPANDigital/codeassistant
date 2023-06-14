@@ -6,13 +6,12 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/spandigitial/codeassistant/client"
-	model2 "github.com/spandigitial/codeassistant/client/model"
+	"github.com/spandigitial/codeassistant/client/openai"
+	"github.com/spandigitial/codeassistant/client/vertexai"
 	"github.com/spandigitial/codeassistant/model"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"golang.org/x/time/rate"
 	"os"
-	"time"
 )
 
 // runPromptsCmd represents the runPrompts command
@@ -23,20 +22,37 @@ var runPromptsCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		commandInstance, err := model.NewCommandInstance(true, map[string]string{}, args...)
 		if err == nil {
-			openAiApiKey := viper.GetString("openAiApiKey")
-			user := viper.GetString("userEmail")
-			userAgent := viper.GetString("userAgent")
-			if userAgent == "" {
-				userAgent = "SPAN Digital codeassistant"
+			backend := viper.GetString("backend")
+			if backend == "" {
+				backend = "openai"
 			}
-			chatGPT := client.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), client.WithUser(user), client.WithUserAgent(userAgent))
+			var llmClient client.LLMClient
+			switch backend {
+			case "openai":
+				openAiApiKey := viper.GetString("openAiApiKey")
+				user := viper.GetString("openAiUserId")
+				userAgent := viper.GetString("userAgent")
+				if userAgent == "" {
+					userAgent = "SPAN Digital codeassistant"
+				}
+				llmClient = openai.New(openAiApiKey, debugger, openai.WithUser(user), openai.WithUserAgent(userAgent))
+			case "vertexai":
+				vertexAiProjectId := viper.GetString("vertexAiProjectId")
+				vertexAiLocation := viper.GetString("vertexAiLocation")
+				vertexAiModel := viper.GetString("vertexAiModel")
+				llmClient = vertexai.New(vertexAiProjectId, vertexAiLocation, vertexAiModel, debugger)
+			}
 			f := bufio.NewWriter(os.Stdout)
 			defer f.Flush()
-			err = chatGPT.Completion(commandInstance, func(objectType string, choice model2.Choice) {
-				if objectType == "chat.completion.chunk" && choice.Delta != nil {
-					fmt.Fprintf(f, "%s", choice.Delta.Content)
+			messages := make(chan client.MessagePart)
+			go func() {
+				err = llmClient.Completion(commandInstance, messages)
+			}()
+			for message := range messages {
+				if message.Type == "Part" {
+					fmt.Fprint(f, message.Delta)
 				}
-			})
+			}
 			fmt.Fprintln(f)
 		}
 		if err != nil {

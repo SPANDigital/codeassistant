@@ -7,28 +7,20 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/spandigitial/codeassistant/client"
-	model2 "github.com/spandigitial/codeassistant/client/model"
+	"github.com/spandigitial/codeassistant/client/openai"
+	"github.com/spandigitial/codeassistant/client/vertexai"
 	"github.com/spandigitial/codeassistant/model"
 	"github.com/spandigitial/codeassistant/web"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"golang.org/x/time/rate"
 	"io"
 	"io/fs"
 	"log"
 	"net/http"
 	"os"
-	"time"
 )
 
-type Message struct {
-	Delta string
-	Type  string
-}
-
-type MessageChan chan Message
-
-var responses = make(map[uuid.UUID]MessageChan)
+var responses = make(map[uuid.UUID]chan client.MessagePart)
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
@@ -97,27 +89,38 @@ to quickly create a Cobra application.`,
 					c.Error(err)
 					return
 				}
-				openAiApiKey := viper.GetString("openAiApiKey")
-				user := viper.GetString("userEmail")
-				userAgent := viper.GetString("userAgent")
-				if userAgent == "" {
-					userAgent = "SPAN Digital codeassistant"
+				backend := viper.GetString("backend")
+				if backend == "" {
+					backend = "openai"
 				}
-				chatGPT := client.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), client.WithUser(user), client.WithUserAgent(userAgent))
-
+				var llmClient client.LLMClient
+				switch backend {
+				case "openai":
+					openAiApiKey := viper.GetString("openAiApiKey")
+					user := viper.GetString("openAiUserId")
+					userAgent := viper.GetString("userAgent")
+					if userAgent == "" {
+						userAgent = "SPAN Digital codeassistant"
+					}
+					llmClient = openai.New(openAiApiKey, debugger, openai.WithUser(user), openai.WithUserAgent(userAgent))
+				case "vertexai":
+					vertexAiProjectId := viper.GetString("vertexAiProjectId")
+					vertexAiLocation := viper.GetString("vertexAiLocation")
+					vertexAiModel := viper.GetString("vertexAiModel")
+					llmClient = vertexai.New(vertexAiProjectId, vertexAiLocation, vertexAiModel, debugger)
+				}
 				uuid := uuid.New()
-				responses[uuid] = make(MessageChan)
+				messageParts := make(chan client.MessagePart)
+				responses[uuid] = messageParts
 				go func() {
-					responses[uuid] <- Message{Delta: "", Type: "Start"}
-					err = chatGPT.Completion(commandInstance, func(objectType string, choice model2.Choice) {
-						if objectType == "chat.completion.chunk" && choice.Delta != nil {
-							responses[uuid] <- Message{Delta: choice.Delta.Content, Type: "Part"}
-						}
-					})
-					responses[uuid] <- Message{Delta: "", Type: "Done"}
+					err = llmClient.Completion(commandInstance, messageParts)
 				}()
-				c.Header("Location", fmt.Sprintf("/api/receive/%s", uuid))
-				c.Status(201)
+				if err == nil {
+					c.Header("Location", fmt.Sprintf("/api/receive/%s", uuid))
+					c.Status(201)
+				} else {
+					c.Error(err)
+				}
 
 			})
 

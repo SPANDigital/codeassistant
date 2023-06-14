@@ -1,5 +1,5 @@
-package model
+package openai
 
-type Delta struct {
+type delta struct {
 	Content string `json:"content"`
 }

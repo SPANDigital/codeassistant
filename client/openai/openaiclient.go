@@ -1,15 +1,14 @@
 // SPDX-License-Identifier: MIT
 
-package client
+package openai
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/debugger"
-	model2 "github.com/spandigitial/codeassistant/client/model"
 	"github.com/spandigitial/codeassistant/model"
-	"github.com/spandigitial/codeassistant/ratelimit"
 	"github.com/spf13/viper"
 	"golang.org/x/time/rate"
 	"io"
@@ -18,23 +17,21 @@ import (
 	"time"
 )
 
-type ChatGPTHttpClient struct {
-	apiKey       string
-	debugger     *debugger.Debugger
-	rateLimiter  *rate.Limiter
-	httpClient   *http.Client
-	rlHTTPClient *ratelimit.RLHTTPClient
-	user         *string
-	userAgent    *string
+type OpenAiClient struct {
+	apiKey      string
+	debugger    *debugger.Debugger
+	rateLimiter *rate.Limiter
+	httpClient  *http.Client
+	user        *string
+	userAgent   *string
 }
 
-type Option func(client *ChatGPTHttpClient)
+type Option func(client *OpenAiClient)
 
-func New(apiKey string, debugger *debugger.Debugger, rateLimiter *rate.Limiter, options ...Option) *ChatGPTHttpClient {
-	c := &ChatGPTHttpClient{
-		apiKey:      apiKey,
-		debugger:    debugger,
-		rateLimiter: rateLimiter,
+func New(apiKey string, debugger *debugger.Debugger, options ...Option) *OpenAiClient {
+	c := &OpenAiClient{
+		apiKey:   apiKey,
+		debugger: debugger,
 	}
 
 	for _, option := range options {
@@ -45,34 +42,30 @@ func New(apiKey string, debugger *debugger.Debugger, rateLimiter *rate.Limiter, 
 		c.httpClient = http.DefaultClient
 	}
 
-	c.rlHTTPClient = &ratelimit.RLHTTPClient{
-		Client:      c.httpClient,
-		Ratelimiter: c.rateLimiter,
-	}
 	return c
 }
 
 func WithHttpClient(httpClient *http.Client) Option {
-	return func(client *ChatGPTHttpClient) {
+	return func(client *OpenAiClient) {
 		client.httpClient = httpClient
 	}
 }
 
 func WithUser(user string) Option {
-	return func(client *ChatGPTHttpClient) {
+	return func(client *OpenAiClient) {
 		client.user = &user
 	}
 }
 
 func WithUserAgent(userAgent string) Option {
-	return func(client *ChatGPTHttpClient) {
+	return func(client *OpenAiClient) {
 		client.userAgent = &userAgent
 	}
 }
 
 var dataRegex = regexp.MustCompile("data: (\\{.+\\})\\w?")
 
-func (c *ChatGPTHttpClient) Models(handlers ...ModelHandler) error {
+func (c *OpenAiClient) Models(models chan<- client.LanguageModel) error {
 	url := "https://api.openai.com/v1/models"
 	requestTime := time.Now()
 
@@ -88,24 +81,12 @@ func (c *ChatGPTHttpClient) Models(handlers ...ModelHandler) error {
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Authorization", "Bearer "+c.apiKey)
 
-	if c.debugger.IsRecording("request-header") {
-		var bytes bytes.Buffer
-		req.Header.Write(&bytes)
-		c.debugger.Message("request-header", bytes.String())
-	}
-
-	resp, err := c.rlHTTPClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
 	}
 
 	defer resp.Body.Close()
-
-	if c.debugger.IsRecording("response-header") {
-		var bytes bytes.Buffer
-		resp.Header.Write(&bytes)
-		c.debugger.Message("response-header", bytes.String())
-	}
 
 	responseTime := time.Now()
 	elapsed := responseTime.Sub(requestTime)
@@ -119,21 +100,19 @@ func (c *ChatGPTHttpClient) Models(handlers ...ModelHandler) error {
 	}
 
 	// Parse the response JSON
-	var response model2.LanguageModelsResponse
+	var response languageModelsResponse
 	err = json.Unmarshal(responseBytes, &response)
 	if err != nil {
 		return err
 	}
 
 	for _, languageModel := range response.Data {
-		for _, handler := range handlers {
-			handler(languageModel)
-		}
+		models <- languageModel
 	}
 	return nil
 }
 
-func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, handlers ...ChoiceHandler) error {
+func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messageParts chan<- client.MessagePart) error {
 	url := "https://api.openai.com/v1/chat/completions"
 
 	for _, prompt := range commandInstance.Prompts {
@@ -141,26 +120,26 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 	}
 
 	// Create the request body
-	request := model2.CompletionsRequest{
+	request := completionsRequest{
 		Messages: commandInstance.Prompts,
 		User:     c.user,
 		Stream:   true,
 	}
 
-	if commandInstance.Command.Model != "" {
-		request.Model = commandInstance.Command.Model
+	if commandInstance.Command.OpenAIConfig.Model != "" {
+		request.Model = commandInstance.Command.OpenAIConfig.Model
 	} else {
-		model := viper.GetString("defaultModel")
+		model := viper.GetString("openAiModel")
 		if model == "" {
 			model = "gpt-3.5-turbo"
 		}
 		request.Model = model
 	}
-	if commandInstance.Command.Temperature != nil {
-		request.Temperature = commandInstance.Command.Temperature
+	if commandInstance.Command.OpenAIConfig.Temperature != nil {
+		request.Temperature = commandInstance.Command.OpenAIConfig.Temperature
 	}
-	if commandInstance.Command.TopP != nil {
-		request.TopP = commandInstance.Command.TopP
+	if commandInstance.Command.OpenAIConfig.TopP != nil {
+		request.TopP = commandInstance.Command.OpenAIConfig.TopP
 	}
 
 	requestBytes, err := json.Marshal(request)
@@ -172,9 +151,11 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 		c.debugger.Message("request-payload", string(requestBytes))
 	}
 
-	if c.debugger.IsRecording("request-tokens") {
-		c.debugger.Message("request-tokens", fmt.Sprintf("%d", debugger.NumTokensFromRequest(request)))
-	}
+	/*
+		if c.debugger.IsRecording("request-tokens") {
+			c.debugger.MessagePart("request-tokens", fmt.Sprintf("%d", debugger.NumTokensFromRequest(request)))
+		}
+	*/
 
 	requestTime := time.Now()
 
@@ -192,22 +173,10 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 	req.Header.Set("Connection", "keep-alive")
 	req.Header.Set("Authorization", "Bearer "+c.apiKey)
 
-	if c.debugger.IsRecording("request-header") {
-		var bytes bytes.Buffer
-		req.Header.Write(&bytes)
-		c.debugger.Message("request-header", bytes.String())
-	}
-
 	// Send the HTTP request]
-	resp, err := c.rlHTTPClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
-	}
-
-	if c.debugger.IsRecording("response-header") {
-		var bytes bytes.Buffer
-		resp.Header.Write(&bytes)
-		c.debugger.Message("response-header", bytes.String())
 	}
 
 	defer resp.Body.Close()
@@ -215,6 +184,7 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 	first := true
 
 	var buff bytes.Buffer
+	messageParts <- client.MessagePart{Delta: "", Type: "Start"}
 	for {
 		data := make([]byte, 1024)
 		read, err := resp.Body.Read(data)
@@ -239,7 +209,7 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 		size := len(bytes)
 		if string(bytes[size-1:size]) == "\n" {
 			if len(data) > 0 && string(data[:1]) == "{" {
-				var response model2.CompletionsResponse
+				var response completionsResponse
 				err = json.Unmarshal(data[:read], &response)
 				if response.Error != nil {
 					return response.Error
@@ -254,15 +224,16 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 			for _, matches := range allMatches {
 
 				if len(matches) > 0 {
-					var response model2.CompletionsResponse
+					var response completionsResponse
 					err = json.Unmarshal(matches[1], &response)
 					if response.Error != nil {
 						return response.Error
 					}
 					if err == nil {
 						for _, choice := range response.Choices {
-							for _, handler := range handlers {
-								handler(response.Object, choice)
+
+							if response.Object == "chat.completion.chunk" && choice.Delta != nil {
+								messageParts <- client.MessagePart{Delta: choice.Delta.Content, Type: "Part"}
 							}
 						}
 					} else {
@@ -272,8 +243,9 @@ func (c *ChatGPTHttpClient) Completion(commandInstance *model.CommandInstance, h
 			}
 			buff.Reset()
 		}
-
 	}
+	messageParts <- client.MessagePart{Delta: "", Type: "Done"}
+	close(messageParts)
 
 	return nil
 }

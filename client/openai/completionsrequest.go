@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 
-package model
+package openai
 
 import (
 	"github.com/spandigitial/codeassistant/model"
 )
 
-type CompletionsRequest struct {
+type completionsRequest struct {
 	Model       string         `json:"model"`
 	Messages    []model.Prompt `json:"messages"`
 	User        *string        `json:"user"`
