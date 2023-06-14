@@ -13,13 +13,11 @@ import (
 	"github.com/spandigitial/codeassistant/web"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"golang.org/x/time/rate"
 	"io"
 	"io/fs"
 	"log"
 	"net/http"
 	"os"
-	"time"
 )
 
 var responses = make(map[uuid.UUID]chan client.MessagePart)
@@ -104,7 +102,7 @@ to quickly create a Cobra application.`,
 					if userAgent == "" {
 						userAgent = "SPAN Digital codeassistant"
 					}
-					llmClient = openai.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), openai.WithUser(user), openai.WithUserAgent(userAgent))
+					llmClient = openai.New(openAiApiKey, debugger, openai.WithUser(user), openai.WithUserAgent(userAgent))
 				case "vertexai":
 					vertexAiProjectId := viper.GetString("vertexAiProjectId")
 					vertexAiLocation := viper.GetString("vertexAiLocation")
@@ -116,8 +114,12 @@ to quickly create a Cobra application.`,
 				go func() {
 					err = llmClient.Completion(commandInstance, messageParts)
 				}()
-				c.Header("Location", fmt.Sprintf("/api/receive/%s", uuid))
-				c.Status(201)
+				if err == nil {
+					c.Header("Location", fmt.Sprintf("/api/receive/%s", uuid))
+					c.Status(201)
+				} else {
+					c.Error(err)
+				}
 
 			})
 

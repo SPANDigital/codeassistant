@@ -8,12 +8,9 @@ import (
 	"fmt"
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/openai"
-	"github.com/spf13/viper"
-	"golang.org/x/time/rate"
-	"os"
-	"time"
-
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"os"
 )
 
 // listModelsCmd represents the listModels command
@@ -28,7 +25,7 @@ var listModelsCmd = &cobra.Command{
 		if userAgent == "" {
 			userAgent = "SPAN Digital codeassistant"
 		}
-		chatGPT := openai.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), openai.WithUser(user), openai.WithUserAgent(userAgent))
+		chatGPT := openai.New(openAiApiKey, debugger, openai.WithUser(user), openai.WithUserAgent(userAgent))
 		f := bufio.NewWriter(os.Stdout)
 		defer f.Flush()
 		models := make(chan client.LanguageModel)

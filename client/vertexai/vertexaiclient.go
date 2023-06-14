@@ -8,19 +8,22 @@ import (
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/debugger"
 	"github.com/spandigitial/codeassistant/model"
+	"github.com/spf13/viper"
+	"google.golang.org/api/option"
 	"google.golang.org/protobuf/types/known/structpb"
+	"time"
 )
 
-type VertexAiClient struct {
+type Client struct {
 	projectId string
 	location  string
 	debugger  *debugger.Debugger
 }
 
-type Option func(client *VertexAiClient)
+type Option func(client *Client)
 
-func New(projectId string, location string, debugger *debugger.Debugger, options ...Option) *VertexAiClient {
-	c := &VertexAiClient{
+func New(projectId string, location string, debugger *debugger.Debugger, options ...Option) *Client {
+	c := &Client{
 		projectId: projectId,
 		location:  location,
 		debugger:  debugger,
@@ -32,16 +35,20 @@ func New(projectId string, location string, debugger *debugger.Debugger, options
 	return c
 }
 
-func (c *VertexAiClient) Models(models chan<- client.LanguageModel) error {
+func (c *Client) Models(models chan<- client.LanguageModel) error {
 	return nil
 }
 
-func (c *VertexAiClient) Completion(commandInstance *model.CommandInstance, messageParts chan<- client.MessagePart) error {
+func (c *Client) Completion(commandInstance *model.CommandInstance, messageParts chan<- client.MessagePart) error {
 	ctx := context.Background()
-	pc, err := aiplatform.NewPredictionClient(ctx)
+	pc, err := aiplatform.NewPredictionClient(ctx,
+		option.WithEndpoint(fmt.Sprintf("%s-aiplatform.googleapis.com:443", c.location)))
 	if err != nil {
 		return err
 	}
+	tctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel() // Always call cancel.
+
 	defer pc.Close()
 
 	temperature := float32(0.2)
@@ -81,12 +88,16 @@ func (c *VertexAiClient) Completion(commandInstance *model.CommandInstance, mess
 	}
 
 	req := &aiplatformpb.PredictRequest{
-		Endpoint:   fmt.Sprintf("%s-aiplatform.googleapis.com:443", c.location),
+		Endpoint: fmt.Sprintf("projects/%s/locations/%s/endpoints/%s",
+			viper.GetString("vertexAiProjectId"),
+			viper.GetString("vertexAiLocation"),
+			viper.GetString("vertexAiModel"),
+		),
 		Instances:  instances,
 		Parameters: parameters,
 	}
 
-	resp, err := pc.Predict(ctx, req)
+	resp, err := pc.Predict(tctx, req)
 	if err != nil {
 		return err
 	}

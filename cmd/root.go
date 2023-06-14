@@ -66,13 +66,13 @@ func init() {
 	if err := viper.BindPFlag("vertexAiProjectId", rootCmd.PersistentFlags().Lookup("vertexAiProjectId")); err != nil {
 		log.Fatal("Unable to find flag vertexAiProjectId", err)
 	}
-	rootCmd.PersistentFlags().String("defaultVertexAiModel", "", "Model to use if not specified (defaqults to text-bison@001")
-	if err := viper.BindPFlag("defaultVertexAiModel", rootCmd.PersistentFlags().Lookup("defaultVertexAiModel")); err != nil {
-		log.Fatal("Unable to find flag defaultVertexAiModel", err)
+	rootCmd.PersistentFlags().String("vertexAiModel", "text-bison@001", "Model to use if not specified (defaults to text-bison@001")
+	if err := viper.BindPFlag("vertexAiModel", rootCmd.PersistentFlags().Lookup("vertexAiModel")); err != nil {
+		log.Fatal("Unable to find flag vertexAiModel", err)
 	}
-	rootCmd.PersistentFlags().String("defaultVertexAiLocation", "", "Locstion to use if not specified (defaqults to us-central1")
-	if err := viper.BindPFlag("defaultVertexAiLocation", rootCmd.PersistentFlags().Lookup("defaultVertexAiLocation")); err != nil {
-		log.Fatal("Unable to find flag defaultVertexAiLocation", err)
+	rootCmd.PersistentFlags().String("vertexAiLocation", "us-central1", "Locstion to use if not specified (defaults to us-central1")
+	if err := viper.BindPFlag("vertexAiLocation", rootCmd.PersistentFlags().Lookup("vertexAiLocation")); err != nil {
+		log.Fatal("Unable to find flag vertexAiLocation", err)
 	}
 	rootCmd.PersistentFlags().String("userEmail", "", "User to send to ChatGPT")
 	if err := viper.BindPFlag("userEmail", rootCmd.PersistentFlags().Lookup("userEmail")); err != nil {

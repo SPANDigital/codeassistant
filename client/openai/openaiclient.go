@@ -9,7 +9,6 @@ import (
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/debugger"
 	"github.com/spandigitial/codeassistant/model"
-	"github.com/spandigitial/codeassistant/ratelimit"
 	"github.com/spf13/viper"
 	"golang.org/x/time/rate"
 	"io"
@@ -19,22 +18,20 @@ import (
 )
 
 type OpenAiClient struct {
-	apiKey       string
-	debugger     *debugger.Debugger
-	rateLimiter  *rate.Limiter
-	httpClient   *http.Client
-	rlHTTPClient *ratelimit.RLHTTPClient
-	user         *string
-	userAgent    *string
+	apiKey      string
+	debugger    *debugger.Debugger
+	rateLimiter *rate.Limiter
+	httpClient  *http.Client
+	user        *string
+	userAgent   *string
 }
 
 type Option func(client *OpenAiClient)
 
-func New(apiKey string, debugger *debugger.Debugger, rateLimiter *rate.Limiter, options ...Option) *OpenAiClient {
+func New(apiKey string, debugger *debugger.Debugger, options ...Option) *OpenAiClient {
 	c := &OpenAiClient{
-		apiKey:      apiKey,
-		debugger:    debugger,
-		rateLimiter: rateLimiter,
+		apiKey:   apiKey,
+		debugger: debugger,
 	}
 
 	for _, option := range options {
@@ -45,10 +42,6 @@ func New(apiKey string, debugger *debugger.Debugger, rateLimiter *rate.Limiter, 
 		c.httpClient = http.DefaultClient
 	}
 
-	c.rlHTTPClient = &ratelimit.RLHTTPClient{
-		Client:      c.httpClient,
-		Ratelimiter: c.rateLimiter,
-	}
 	return c
 }
 
@@ -94,7 +87,7 @@ func (c *OpenAiClient) Models(models chan<- client.LanguageModel) error {
 		c.debugger.Message("request-header", bytes.String())
 	}
 
-	resp, err := c.rlHTTPClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
 	}
@@ -199,7 +192,7 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messag
 	}
 
 	// Send the HTTP request]
-	resp, err := c.rlHTTPClient.Do(req)
+	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return err
 	}

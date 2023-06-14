@@ -11,9 +11,7 @@ import (
 	"github.com/spandigitial/codeassistant/model"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"golang.org/x/time/rate"
 	"os"
-	"time"
 )
 
 // runPromptsCmd represents the runPrompts command
@@ -37,7 +35,7 @@ var runPromptsCmd = &cobra.Command{
 				if userAgent == "" {
 					userAgent = "SPAN Digital codeassistant"
 				}
-				llmClient = openai.New(openAiApiKey, debugger, rate.NewLimiter(rate.Every(60*time.Second), 20), openai.WithUser(user), openai.WithUserAgent(userAgent))
+				llmClient = openai.New(openAiApiKey, debugger, openai.WithUser(user), openai.WithUserAgent(userAgent))
 			case "vertexai":
 				vertexAiProjectId := viper.GetString("vertexAiProjectId")
 				vertexAiLocation := viper.GetString("vertexAiLocation")
