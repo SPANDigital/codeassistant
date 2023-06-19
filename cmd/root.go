@@ -57,6 +57,18 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.codeassistant.yaml)")
+	rootCmd.PersistentFlags().String("llamaCppBinaryPath", "", "Path to LlamaCpp binary")
+	if err := viper.BindPFlag("llamaCppBinaryPath", rootCmd.PersistentFlags().Lookup("llamaCppBinaryPath")); err != nil {
+		log.Fatal("Unable to find flag llamaCppBinaryPath", err)
+	}
+	rootCmd.PersistentFlags().String("llamaCppModelPath", "", "Path to LlamaCpp model")
+	if err := viper.BindPFlag("llamaCppModelPath", rootCmd.PersistentFlags().Lookup("llamaCppModelPath")); err != nil {
+		log.Fatal("Unable to find flag llamaCppModelPath", err)
+	}
+	rootCmd.PersistentFlags().Int("llamaCppContextSize", 256, "LlammaCpp context size")
+	if err := viper.BindPFlag("llamaCppContextSize", rootCmd.PersistentFlags().Lookup("llamaCppContextSize")); err != nil {
+		log.Fatal("Unable to find flag llamaCppContextSize", err)
+	}
 	rootCmd.PersistentFlags().String("openAiApiKey", "", "OpenAI API Key")
 	if err := viper.BindPFlag("openAiApiKey", rootCmd.PersistentFlags().Lookup("openAiApiKey")); err != nil {
 		log.Fatal("Unable to find flag openAiApiKey", err)

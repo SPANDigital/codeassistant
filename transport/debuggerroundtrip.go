@@ -11,9 +11,9 @@ type DebuggerRoundtrip struct {
 	debugger  *debugger.Debugger
 }
 
-func New(debugger *debugger.Debugger) *DebuggerRoundtrip {
+func New(transport http.RoundTripper, debugger *debugger.Debugger) *DebuggerRoundtrip {
 	return &DebuggerRoundtrip{
-		transport: http.DefaultTransport,
+		transport: transport,
 		debugger:  debugger,
 	}
 }

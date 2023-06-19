@@ -9,6 +9,7 @@ import (
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/debugger"
 	"github.com/spandigitial/codeassistant/model"
+	"github.com/spandigitial/codeassistant/transport"
 	"github.com/spf13/viper"
 	"golang.org/x/time/rate"
 	"io"
@@ -17,7 +18,7 @@ import (
 	"time"
 )
 
-type OpenAiClient struct {
+type Client struct {
 	apiKey      string
 	debugger    *debugger.Debugger
 	rateLimiter *rate.Limiter
@@ -26,10 +27,10 @@ type OpenAiClient struct {
 	userAgent   *string
 }
 
-type Option func(client *OpenAiClient)
+type Option func(client *Client)
 
-func New(apiKey string, debugger *debugger.Debugger, options ...Option) *OpenAiClient {
-	c := &OpenAiClient{
+func New(apiKey string, debugger *debugger.Debugger, options ...Option) *Client {
+	c := &Client{
 		apiKey:   apiKey,
 		debugger: debugger,
 	}
@@ -42,30 +43,32 @@ func New(apiKey string, debugger *debugger.Debugger, options ...Option) *OpenAiC
 		c.httpClient = http.DefaultClient
 	}
 
+	c.httpClient.Transport = transport.New(c.httpClient.Transport, c.debugger)
+
 	return c
 }
 
 func WithHttpClient(httpClient *http.Client) Option {
-	return func(client *OpenAiClient) {
+	return func(client *Client) {
 		client.httpClient = httpClient
 	}
 }
 
 func WithUser(user string) Option {
-	return func(client *OpenAiClient) {
+	return func(client *Client) {
 		client.user = &user
 	}
 }
 
 func WithUserAgent(userAgent string) Option {
-	return func(client *OpenAiClient) {
+	return func(client *Client) {
 		client.userAgent = &userAgent
 	}
 }
 
 var dataRegex = regexp.MustCompile("data: (\\{.+\\})\\w?")
 
-func (c *OpenAiClient) Models(models chan<- client.LanguageModel) error {
+func (c *Client) Models(models chan<- client.LanguageModel) error {
 	url := "https://api.openai.com/v1/models"
 	requestTime := time.Now()
 
@@ -112,7 +115,7 @@ func (c *OpenAiClient) Models(models chan<- client.LanguageModel) error {
 	return nil
 }
 
-func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messageParts chan<- client.MessagePart) error {
+func (c *Client) Completion(commandInstance *model.CommandInstance, messageParts chan<- client.MessagePart) error {
 	url := "https://api.openai.com/v1/chat/completions"
 
 	for _, prompt := range commandInstance.Prompts {

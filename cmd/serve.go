@@ -104,10 +104,11 @@ to quickly create a Cobra application.`,
 					}
 					llmClient = openai.New(openAiApiKey, debugger, openai.WithUser(user), openai.WithUserAgent(userAgent))
 				case "vertexai":
+					gcloudBinaryPath := viper.GetString("gcloudBinary")
 					vertexAiProjectId := viper.GetString("vertexAiProjectId")
 					vertexAiLocation := viper.GetString("vertexAiLocation")
 					vertexAiModel := viper.GetString("vertexAiModel")
-					llmClient = vertexai.New(vertexAiProjectId, vertexAiLocation, vertexAiModel, debugger)
+					llmClient = vertexai.New(gcloudBinaryPath, vertexAiProjectId, vertexAiLocation, vertexAiModel, debugger)
 				}
 				uuid := uuid.New()
 				messageParts := make(chan client.MessagePart)
