@@ -7,6 +7,7 @@ import (
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/debugger"
 	"github.com/spandigitial/codeassistant/model"
+	"github.com/spandigitial/codeassistant/transport"
 	"io"
 	"net/http"
 	"time"
@@ -23,8 +24,8 @@ type Client struct {
 
 type Option func(client *Client)
 
-func New(projectId string, location string, model string, debugger *debugger.Debugger, options ...Option) *Client {
-	accessToken, _ := generateAccessToken()
+func New(gcloudBinaryPath string, projectId string, location string, model string, debugger *debugger.Debugger, options ...Option) *Client {
+	accessToken, _ := generateAccessToken(gcloudBinaryPath)
 	c := &Client{
 		accessToken: accessToken,
 		projectId:   projectId,
@@ -40,6 +41,8 @@ func New(projectId string, location string, model string, debugger *debugger.Deb
 	if c.httpClient == nil {
 		c.httpClient = http.DefaultClient
 	}
+
+	c.httpClient.Transport = transport.New(c.httpClient.Transport, c.debugger)
 
 	return c
 }
@@ -76,7 +79,7 @@ func (c *Client) Completion(commandInstance *model.CommandInstance, messageParts
 
 	request := predictRequest{
 		Instances: []instance{{
-			Content: commandInstance.JoinedPromptsContent("\n"),
+			Content: commandInstance.JoinedPromptsContent("\n\n"),
 		}},
 		Parameters: parameters,
 	}
