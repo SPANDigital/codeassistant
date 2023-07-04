@@ -121,7 +121,7 @@ brews:
       # Since: v1.17
       pull_request:
         # Whether to enable it or not.
-        enabled: true
+        enabled: false
 
         # Base branch of the PR.
         #
