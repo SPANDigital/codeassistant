@@ -42,6 +42,11 @@ promptsLibraryDir: <directory to load prompts, defaults to $HOME/prompts-library
 You will need to install the gcloud sdk before using VertexAI.
 You will need a project on Google Cloud which gives your user access to Vertex AI.
 
+You need to login with:
+`gcloud auth login`
+
+Before using.
+
 ### Sample configuration
 
 ```yaml

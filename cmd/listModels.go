@@ -29,7 +29,10 @@ var listModelsCmd = &cobra.Command{
 		f := bufio.NewWriter(os.Stdout)
 		defer f.Flush()
 		models := make(chan client.LanguageModel)
-		err := chatGPT.Models(models)
+		var err error
+		go func() {
+			err = chatGPT.Models(models)
+		}()
 		for model := range models {
 			fmt.Fprintln(os.Stdout, model)
 		}

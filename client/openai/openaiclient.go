@@ -109,6 +109,9 @@ func (c *OpenAiClient) Models(models chan<- client.LanguageModel) error {
 	for _, languageModel := range response.Data {
 		models <- languageModel
 	}
+
+	close(models)
+
 	return nil
 }
 
