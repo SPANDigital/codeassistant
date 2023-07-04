@@ -5,14 +5,13 @@ package cmd
 import (
 	"fmt"
 	debugger2 "github.com/spandigitial/codeassistant/client/debugger"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"log"
 	"os"
 	"os/exec"
 	"os/user"
 	"path/filepath"
-
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var cfgFile string

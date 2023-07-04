@@ -2,7 +2,9 @@
 
 package main
 
-import "github.com/spandigitial/codeassistant/cmd"
+import (
+	"github.com/spandigitial/codeassistant/cmd"
+)
 
 func main() {
 	cmd.Execute()
