@@ -69,7 +69,7 @@ func init() {
 	if err := viper.BindPFlag("openAiUserId", rootCmd.PersistentFlags().Lookup("openAiUserId")); err != nil {
 		log.Fatal("Unable to find flag userEmail", err)
 	}
-	rootCmd.PersistentFlags().String("openAiModel", "gpt-3.5-turbo", "Model to use if not specified")
+	rootCmd.PersistentFlags().String("openAiModel", "gpt-4", "Model to use if not specified")
 	if err := viper.BindPFlag("openAiModel", rootCmd.PersistentFlags().Lookup("openAiModel")); err != nil {
 		log.Fatal("Unable to find flag openAiModel", err)
 	}

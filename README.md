@@ -115,7 +115,7 @@ codeassistant serve
 or to override the default model
 
 ```bash
-codeassistant serve --defaultModel gpt-4
+codeassistant serve --openAiModel gpt-4
 ```
 
 ### List all the commands in your prompt libraries
@@ -133,7 +133,7 @@ codeassistant run <library> <command> <var1:value> <vae2:value>
 or to override the default model
 
 ```bash
-codeassistant run <library> <command> <var1:value> <vae2:value> --defaultModel gpt-4
+codeassistant run <library> <command> <var1:value> <vae2:value> --openAiModel gpt-4
 ```
 
 ### List available  models (beta)
