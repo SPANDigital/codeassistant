@@ -72,6 +72,10 @@ func init() {
 	if err := viper.BindPFlag("openAiModel", rootCmd.PersistentFlags().Lookup("openAiModel")); err != nil {
 		log.Fatal("Unable to find flag openAiModel", err)
 	}
+	rootCmd.PersistentFlags().String("openAiUrlPrefix", "https://api.openai.com", "Prefix of OpenAI Urls")
+	if err := viper.BindPFlag("openAiUrlPrefix", rootCmd.PersistentFlags().Lookup("openAiUrlPrefix")); err != nil {
+		log.Fatal("Unable to find flag openAiUrlPrefix", err)
+	}
 	var gcloudBinary = "gcloud"
 	if found, err := exec.LookPath("gcloud"); err == nil {
 		gcloudBinary = found

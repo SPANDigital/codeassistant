@@ -66,7 +66,7 @@ func WithUserAgent(userAgent string) Option {
 var dataRegex = regexp.MustCompile("data: (\\{.+\\})\\w?")
 
 func (c *OpenAiClient) Models(models chan<- client.LanguageModel) error {
-	url := "https://api.openai.com/v1/models"
+	url := fmt.Sprintf("%s/v1/models", viper.GetString("openAiUrlPrefix"))
 	requestTime := time.Now()
 
 	c.debugger.Message("request-time", fmt.Sprintf("%v", requestTime))
@@ -116,7 +116,7 @@ func (c *OpenAiClient) Models(models chan<- client.LanguageModel) error {
 }
 
 func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messageParts chan<- client.MessagePart) error {
-	url := "https://api.openai.com/v1/chat/completions"
+	url := fmt.Sprintf("%s/v1/chat/completions", viper.GetString("openAiUrlPrefix"))
 
 	for _, prompt := range commandInstance.Prompts {
 		c.debugger.Message("sent-prompt", fmt.Sprintf("(%s) %s", prompt.Role, prompt.Content))
