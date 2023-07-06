@@ -50,10 +50,10 @@ var runPromptsCmd = &cobra.Command{
 			}()
 			for message := range messages {
 				if message.Type == "Part" {
-					fmt.Fprint(f, message.Delta)
+					fmt.Print(message.Delta)
 				}
 			}
-			fmt.Fprintln(f)
+			fmt.Println()
 		}
 		if err != nil {
 			fmt.Fprintf(os.Stderr, err.Error())
