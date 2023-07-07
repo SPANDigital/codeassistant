@@ -72,7 +72,7 @@ func (c *OpenAiClient) Models(models chan<- client.LanguageModel) error {
 	c.debugger.MessageF(debugger.RequestTime, "%v", requestTime)
 
 	// Create the HTTP request
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		return err
 	}
@@ -157,7 +157,7 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messag
 	c.debugger.Message(debugger.RequestHeader, fmt.Sprintf("%v", requestTime))
 
 	// Create the HTTP request
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBytes))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(requestBytes))
 	if err != nil {
 		return err
 	}

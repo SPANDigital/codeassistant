@@ -96,7 +96,7 @@ func (c *Client) Completion(commandInstance *model.CommandInstance, messageParts
 
 	c.debugger.Message(debugger.RequestTime, fmt.Sprintf("%v", time.Now()))
 
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBytes))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(requestBytes))
 	if err != nil {
 		return err
 	}
