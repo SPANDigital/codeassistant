@@ -33,7 +33,7 @@ func (d *Debugger) MessageF(detail Detail, format string, a ...any) {
 	if _, found := d.detailsMap[detail]; !found {
 		return
 	}
-	fmt.Fprintf(os.Stderr, "%s >>> %s\n", detail, fmt.Sprintf(format, a))
+	fmt.Fprintf(os.Stderr, "%s >>> %s\n", detail, fmt.Sprintf(format, a...))
 }
 
 func (d *Debugger) MessageBytes(detail Detail, message []byte) {
