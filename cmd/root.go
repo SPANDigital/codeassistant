@@ -5,6 +5,7 @@ package cmd
 import (
 	"fmt"
 	debugger2 "github.com/spandigitial/codeassistant/client/debugger"
+	"github.com/spandigitial/codeassistant/slices"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"log"
@@ -31,10 +32,11 @@ to quickly create a Cobra application.`,
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		debugger = debugger2.New(viper.GetStringSlice("debug")...)
-		if debugger.IsRecording("configuration") {
-			debugger.Message("configuration", fmt.Sprintf("%v", viper.AllSettings()))
-		}
+		debugger = debugger2.New(slices.MapSlice(viper.GetStringSlice("debug"), func(s string) debugger2.Detail {
+			detail, _ := debugger2.Parse(s)
+			return detail
+		})...)
+		debugger.MessageF(debugger2.Configuration, "%v", viper.AllSettings())
 	},
 }
 
@@ -102,7 +104,7 @@ func init() {
 	if err == nil {
 		promptsLibraryDir = filepath.Join(home, "prompts-library")
 	}
-	rootCmd.PersistentFlags().String("promptsLibraryDir", promptsLibraryDir, "Promptsgit library Dir")
+	rootCmd.PersistentFlags().String("promptsLibraryDir", promptsLibraryDir, "Prompts library Dir")
 	if err := viper.BindPFlag("promptsLibraryDir", rootCmd.PersistentFlags().Lookup("promptsLibraryDir")); err != nil {
 		log.Fatal("Unable to find flag promptsLibraryDir", err)
 	}

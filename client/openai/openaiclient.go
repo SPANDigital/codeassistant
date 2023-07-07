@@ -69,7 +69,7 @@ func (c *OpenAiClient) Models(models chan<- client.LanguageModel) error {
 	url := fmt.Sprintf("%s/v1/models", viper.GetString("openAiUrlPrefix"))
 	requestTime := time.Now()
 
-	c.debugger.Message("request-time", fmt.Sprintf("%v", requestTime))
+	c.debugger.MessageF(debugger.RequestTime, "%v", requestTime)
 
 	// Create the HTTP request
 	req, err := http.NewRequest("GET", url, nil)
@@ -90,8 +90,8 @@ func (c *OpenAiClient) Models(models chan<- client.LanguageModel) error {
 
 	responseTime := time.Now()
 	elapsed := responseTime.Sub(requestTime)
-	c.debugger.Message("first-response-time", fmt.Sprintf("%v elapsed %v", responseTime, elapsed))
-	c.debugger.Message("last-response-time", fmt.Sprintf("%v elapsed %v", responseTime, elapsed))
+	c.debugger.MessageF(debugger.FirstResponseTime, "%v elapsed %v", responseTime, elapsed)
+	c.debugger.MessageF(debugger.LastResponseTime, "%v elapsed %v", responseTime, elapsed)
 
 	// Read the response body
 	responseBytes, err := io.ReadAll(resp.Body)
@@ -119,7 +119,7 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messag
 	url := fmt.Sprintf("%s/v1/chat/completions", viper.GetString("openAiUrlPrefix"))
 
 	for _, prompt := range commandInstance.Prompts {
-		c.debugger.Message("sent-prompt", fmt.Sprintf("(%s) %s", prompt.Role, prompt.Content))
+		c.debugger.Message(debugger.SentPrompt, fmt.Sprintf("(%s) %s", prompt.Role, prompt.Content))
 	}
 
 	// Create the request body
@@ -150,19 +150,11 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messag
 		panic(err)
 	}
 
-	if c.debugger.IsRecording("request-payload") {
-		c.debugger.Message("request-payload", string(requestBytes))
-	}
-
-	/*
-		if c.debugger.IsRecording("request-tokens") {
-			c.debugger.MessagePart("request-tokens", fmt.Sprintf("%d", debugger.NumTokensFromRequest(request)))
-		}
-	*/
+	c.debugger.MessageBytes(debugger.RequestPayload, requestBytes)
 
 	requestTime := time.Now()
 
-	c.debugger.Message("request-time", fmt.Sprintf("%v", requestTime))
+	c.debugger.Message(debugger.RequestHeader, fmt.Sprintf("%v", requestTime))
 
 	// Create the HTTP request
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBytes))
@@ -194,13 +186,13 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messag
 
 		if first {
 			firstResponseTime := time.Now()
-			c.debugger.Message("first-response-time", fmt.Sprintf("%v elapsed %v", firstResponseTime, firstResponseTime.Sub(requestTime)))
+			c.debugger.Message(debugger.FirstResponseTime, fmt.Sprintf("%v elapsed %v", firstResponseTime, firstResponseTime.Sub(requestTime)))
 			first = false
 		}
 
 		if err == io.EOF {
 			lastResponseTime := time.Now()
-			c.debugger.Message("last-response-time", fmt.Sprintf("%v elapsed %v", lastResponseTime, lastResponseTime.Sub(requestTime)))
+			c.debugger.Message(debugger.LastResponseTime, fmt.Sprintf("%v elapsed %v", lastResponseTime, lastResponseTime.Sub(requestTime)))
 			return nil
 		}
 		if err != nil {

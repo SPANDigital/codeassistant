@@ -3,7 +3,6 @@
 package cmd
 
 import (
-	"bufio"
 	"fmt"
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/openai"
@@ -42,8 +41,6 @@ var runPromptsCmd = &cobra.Command{
 				vertexAiModel := viper.GetString("vertexAiModel")
 				llmClient = vertexai.New(vertexAiProjectId, vertexAiLocation, vertexAiModel, debugger)
 			}
-			f := bufio.NewWriter(os.Stdout)
-			defer f.Flush()
 			messages := make(chan client.MessagePart)
 			go func() {
 				err = llmClient.Completion(commandInstance, messages)

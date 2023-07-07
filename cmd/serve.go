@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/spandigitial/codeassistant/client"
+	debugger2 "github.com/spandigitial/codeassistant/client/debugger"
 	"github.com/spandigitial/codeassistant/client/openai"
 	"github.com/spandigitial/codeassistant/client/vertexai"
 	"github.com/spandigitial/codeassistant/model"
@@ -39,7 +40,7 @@ to quickly create a Cobra application.`,
 		dist, err := fs.Sub(web.FileSystem, "dist")
 		if err == nil {
 			router := gin.Default()
-			if !debugger.IsRecording("webserver") {
+			if !debugger.IsRecording(debugger2.WebServer) {
 				gin.SetMode(gin.ReleaseMode)
 			} else {
 				gin.SetMode(gin.DebugMode)
