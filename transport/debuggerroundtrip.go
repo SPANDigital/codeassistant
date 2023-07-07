@@ -19,19 +19,19 @@ func New(debugger *debugger.Debugger) *DebuggerRoundtrip {
 }
 
 func (d *DebuggerRoundtrip) RoundTrip(request *http.Request) (*http.Response, error) {
-	if d.debugger.IsRecording("request-header") {
+	d.debugger.MessageCalculatedF(debugger.RequestHeader, "%s", func() any {
 		var bytes bytes.Buffer
 		request.Header.Write(&bytes)
-		d.debugger.Message("request-header", bytes.String())
-	}
+		return bytes.String()
+	})
 	response, err := d.transport.RoundTrip(request)
 	if err != nil {
 		return nil, err
 	}
-	if d.debugger.IsRecording("response-header") {
+	d.debugger.MessageCalculatedF(debugger.ResponseHeader, "%s", func() any {
 		var bytes bytes.Buffer
-		request.Header.Write(&bytes)
-		d.debugger.Message("response-header", bytes.String())
-	}
+		response.Header.Write(&bytes)
+		return bytes.String()
+	})
 	return response, nil
 }

@@ -36,6 +36,17 @@ func (d *Debugger) MessageF(detail Detail, format string, a ...any) {
 	fmt.Fprintf(os.Stderr, "%s >>> %s\n", detail, fmt.Sprintf(format, a...))
 }
 
+func (d *Debugger) MessageCalculatedF(detail Detail, format string, a ...func() any) {
+	if _, found := d.detailsMap[detail]; !found {
+		return
+	}
+	values := make([]any, len(a))
+	for idx, f := range a {
+		values[idx] = f()
+	}
+	fmt.Fprintf(os.Stderr, "%s >>> %s\n", detail, fmt.Sprintf(format, values...))
+}
+
 func (d *Debugger) MessageBytes(detail Detail, message []byte) {
 	if _, found := d.detailsMap[detail]; !found {
 		return
