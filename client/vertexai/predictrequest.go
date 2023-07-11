@@ -1,6 +1,6 @@
 package vertexai
 
 type predictRequest struct {
-	Instances  []instance `json:"instances"`
-	Parameters parameters `json:"parameters"`
+	Instances  []map[string]interface{} `json:"instances"`
+	Parameters parameters               `json:"parameters"`
 }

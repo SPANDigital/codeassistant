@@ -94,6 +94,10 @@ func init() {
 	if err := viper.BindPFlag("vertexAiModel", rootCmd.PersistentFlags().Lookup("vertexAiModel")); err != nil {
 		log.Fatal("Unable to find flag vertexAiModel", err)
 	}
+	rootCmd.PersistentFlags().String("vertexAiPromptAttribute", "content", "Model to use if not specified")
+	if err := viper.BindPFlag("vertexAiPromptAttribute", rootCmd.PersistentFlags().Lookup("vertexAiPromptAttribute")); err != nil {
+		log.Fatal("Unable to find flag vertexAiModel", err)
+	}
 	rootCmd.PersistentFlags().String("vertexAiLocation", "us-central1", "Locstion to use if not specified")
 	if err := viper.BindPFlag("vertexAiLocation", rootCmd.PersistentFlags().Lookup("vertexAiLocation")); err != nil {
 		log.Fatal("Unable to find flag vertexAiLocation", err)

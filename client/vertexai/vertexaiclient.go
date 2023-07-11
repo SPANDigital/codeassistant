@@ -7,6 +7,7 @@ import (
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/debugger"
 	"github.com/spandigitial/codeassistant/model"
+	"github.com/spf13/viper"
 	"io"
 	"net/http"
 	"time"
@@ -74,14 +75,15 @@ func (c *Client) Completion(commandInstance *model.CommandInstance, messageParts
 		TopK:            topK,
 	}
 
+	prompt := commandInstance.JoinedPromptsContent("\n")
 	request := predictRequest{
-		Instances: []instance{{
-			Content: commandInstance.JoinedPromptsContent("\n"),
+		Instances: []map[string]interface{}{{
+			viper.GetString("vertexAiPromptAttribute"): prompt,
 		}},
 		Parameters: parameters,
 	}
 
-	c.debugger.Message(debugger.SentPrompt, request.Instances[0].Content)
+	c.debugger.Message(debugger.SentPrompt, prompt)
 
 	requestBytes, err := json.Marshal(request)
 	if err != nil {
