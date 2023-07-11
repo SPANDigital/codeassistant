@@ -6,8 +6,7 @@ import (
 	"fmt"
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/debugger"
-	"github.com/spandigitial/codeassistant/model/prompts"
-	"github.com/spandigitial/codeassistant/vectors"
+	"github.com/spandigitial/codeassistant/model"
 	"github.com/spf13/viper"
 	"io"
 	"net/http"
@@ -50,7 +49,7 @@ func (c *Client) Models(models chan<- client.LanguageModel) error {
 	return nil
 }
 
-func (c *Client) Completion(commandInstance *prompts.CommandInstance, messageParts chan<- client.MessagePart) error {
+func (c *Client) Completion(commandInstance *model.CommandInstance, messageParts chan<- client.MessagePart) error {
 
 	temperature := float64(0.2)
 	if commandInstance.Command.VertexAIConfig.Temperature != nil {
@@ -88,7 +87,7 @@ func (c *Client) Completion(commandInstance *prompts.CommandInstance, messagePar
 
 	requestBytes, err := json.Marshal(request)
 	if err != nil {
-		return err
+		panic(err)
 	}
 
 	url := fmt.Sprintf("https://%s-aiplatform.googleapis.com/v1/projects/%s/locations/%s/publishers/google/models/%s:predict",
@@ -96,6 +95,8 @@ func (c *Client) Completion(commandInstance *prompts.CommandInstance, messagePar
 		c.projectId,
 		c.location,
 		c.model)
+
+	c.debugger.Message(debugger.RequestTime, fmt.Sprintf("%v", time.Now()))
 
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(requestBytes))
 	if err != nil {
@@ -107,7 +108,6 @@ func (c *Client) Completion(commandInstance *prompts.CommandInstance, messagePar
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.accessToken))
 
 	requestTime := time.Now()
-	c.debugger.Message(debugger.RequestTime, fmt.Sprintf("%v", requestTime))
 	// Send the HTTP request]
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -136,13 +136,5 @@ func (c *Client) Completion(commandInstance *prompts.CommandInstance, messagePar
 	}
 	messageParts <- client.MessagePart{Delta: "", Type: "Done"}
 	close(messageParts)
-	return nil
-}
-
-func (c *Client) Embeddings(model string, input string) (vectors.Vector, error) {
-	return nil, nil
-}
-
-func (c *Client) SimpleCompletion(model string, roleHint string, input string, messageParts chan<- client.MessagePart) error {
 	return nil
 }
