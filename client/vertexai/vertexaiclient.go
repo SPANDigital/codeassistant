@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/debugger"
-	"github.com/spandigitial/codeassistant/model"
+	"github.com/spandigitial/codeassistant/model/prompts"
 	"github.com/spf13/viper"
 	"io"
 	"net/http"
@@ -49,7 +49,7 @@ func (c *Client) Models(models chan<- client.LanguageModel) error {
 	return nil
 }
 
-func (c *Client) Completion(commandInstance *model.CommandInstance, messageParts chan<- client.MessagePart) error {
+func (c *Client) Completion(commandInstance *prompts.CommandInstance, messageParts chan<- client.MessagePart) error {
 
 	temperature := float64(0.2)
 	if commandInstance.Command.VertexAIConfig.Temperature != nil {
@@ -87,7 +87,7 @@ func (c *Client) Completion(commandInstance *model.CommandInstance, messageParts
 
 	requestBytes, err := json.Marshal(request)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	url := fmt.Sprintf("https://%s-aiplatform.googleapis.com/v1/projects/%s/locations/%s/publishers/google/models/%s:predict",

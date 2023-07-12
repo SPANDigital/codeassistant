@@ -70,9 +70,13 @@ func init() {
 	if err := viper.BindPFlag("openAiUserId", rootCmd.PersistentFlags().Lookup("openAiUserId")); err != nil {
 		log.Fatal("Unable to find flag userEmail", err)
 	}
-	rootCmd.PersistentFlags().String("openAiModel", "gpt-4", "Model to use if not specified")
-	if err := viper.BindPFlag("openAiModel", rootCmd.PersistentFlags().Lookup("openAiModel")); err != nil {
-		log.Fatal("Unable to find flag openAiModel", err)
+	rootCmd.PersistentFlags().String("openAiCompletionsModel", "gpt-4", "Model to use if not specified")
+	if err := viper.BindPFlag("openAiCompletionsModel", rootCmd.PersistentFlags().Lookup("openAiCompletionsModel")); err != nil {
+		log.Fatal("Unable to find flag openAiCompletionsModel", err)
+	}
+	rootCmd.PersistentFlags().String("openAiEmbeddingsModel", "text-embedding-ada-002", "Model to use if not specified")
+	if err := viper.BindPFlag("openAiEmbeddingsModel", rootCmd.PersistentFlags().Lookup("openAiCompletionsModel")); err != nil {
+		log.Fatal("Unable to find flag openAiCompletionsModel", err)
 	}
 	rootCmd.PersistentFlags().String("openAiUrlPrefix", "https://api.openai.com", "Prefix of OpenAI Urls")
 	if err := viper.BindPFlag("openAiUrlPrefix", rootCmd.PersistentFlags().Lookup("openAiUrlPrefix")); err != nil {
@@ -103,12 +107,14 @@ func init() {
 		log.Fatal("Unable to find flag vertexAiLocation", err)
 	}
 	// Find home directory.
-	promptsLibraryDir := ""
+	promptsLibraryDir, embeddingsLibraryDir := "", ""
 	home, err := os.UserHomeDir()
 	if err == nil {
 		promptsLibraryDir = filepath.Join(home, "prompts-library")
+		embeddingsLibraryDir = filepath.Join(home, "embeddings-library")
 	}
 	rootCmd.PersistentFlags().String("promptsLibraryDir", promptsLibraryDir, "Prompts library Dir")
+	rootCmd.PersistentFlags().String("embeddingsLibraryDir", embeddingsLibraryDir, "Embedding Library Dir")
 	if err := viper.BindPFlag("promptsLibraryDir", rootCmd.PersistentFlags().Lookup("promptsLibraryDir")); err != nil {
 		log.Fatal("Unable to find flag promptsLibraryDir", err)
 	}

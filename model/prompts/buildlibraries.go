@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-package model
+package prompts
 
 import (
 	"github.com/spf13/viper"

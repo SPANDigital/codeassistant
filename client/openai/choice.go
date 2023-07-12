@@ -2,13 +2,15 @@
 
 package openai
 
-import "github.com/spandigitial/codeassistant/model"
+import (
+	"github.com/spandigitial/codeassistant/model/prompts"
+)
 
 type choice struct {
-	Delta        *delta        `json:"delta"`
-	Message      *model.Prompt `json:"message"`
-	FinishReason string        `json:"finish_reason"`
-	Index        int           `json:"index"`
+	Delta        *delta          `json:"delta"`
+	Message      *prompts.Prompt `json:"message"`
+	FinishReason string          `json:"finish_reason"`
+	Index        int             `json:"index"`
 }
 
 func (c choice) String() string {

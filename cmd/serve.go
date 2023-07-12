@@ -10,7 +10,7 @@ import (
 	debugger2 "github.com/spandigitial/codeassistant/client/debugger"
 	"github.com/spandigitial/codeassistant/client/openai"
 	"github.com/spandigitial/codeassistant/client/vertexai"
-	"github.com/spandigitial/codeassistant/model"
+	"github.com/spandigitial/codeassistant/model/prompts"
 	"github.com/spandigitial/codeassistant/web"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -35,7 +35,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
-		libraries := model.BuildLibraries()
+		libraries := prompts.BuildLibraries()
 
 		dist, err := fs.Sub(web.FileSystem, "dist")
 		if err == nil {
@@ -76,7 +76,7 @@ to quickly create a Cobra application.`,
 			})
 			router.POST("/api/prompt/:libraryName/:commandName", func(c *gin.Context) {
 				defaultParams := make(map[string]string)
-				params, err := model.CommandInstanceParams(c.Param("libraryName"), c.Param("commandName"))
+				params, err := prompts.CommandInstanceParams(c.Param("libraryName"), c.Param("commandName"))
 				if err != nil {
 					c.Error(err)
 					return
@@ -84,7 +84,7 @@ to quickly create a Cobra application.`,
 				for _, param := range params {
 					defaultParams[param] = c.PostForm(param)
 				}
-				commandInstance, err := model.NewCommandInstance(false, defaultParams, c.Param("libraryName"), c.Param("commandName"))
+				commandInstance, err := prompts.NewCommandInstance(false, defaultParams, c.Param("libraryName"), c.Param("commandName"))
 				if err != nil {
 					fmt.Fprintln(os.Stderr, "Can't find command", err.Error())
 					c.Error(err)

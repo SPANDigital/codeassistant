@@ -1,4 +1,4 @@
-package model
+package prompts
 
 type UiHint struct {
 	Label      string                 `yaml:"label"`

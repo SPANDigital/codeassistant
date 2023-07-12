@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/debugger"
-	"github.com/spandigitial/codeassistant/model"
+	"github.com/spandigitial/codeassistant/model/prompts"
 	"github.com/spf13/viper"
 	"golang.org/x/time/rate"
 	"io"
@@ -115,8 +115,8 @@ func (c *OpenAiClient) Models(models chan<- client.LanguageModel) error {
 	return nil
 }
 
-func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messageParts chan<- client.MessagePart) error {
-	url := fmt.Sprintf("%s/v1/chat/completions", viper.GetString("openAiUrlPrefix"))
+func (c *OpenAiClient) Completion(commandInstance *prompts.CommandInstance, messageParts chan<- client.MessagePart) error {
+	url := fmt.Sprintf("%s/v1/chat/prompts", viper.GetString("openAiUrlPrefix"))
 
 	for _, prompt := range commandInstance.Prompts {
 		c.debugger.Message(debugger.SentPrompt, fmt.Sprintf("(%s) %s", prompt.Role, prompt.Content))
@@ -244,3 +244,8 @@ func (c *OpenAiClient) Completion(commandInstance *model.CommandInstance, messag
 
 	return nil
 }
+
+/*func (c *OpenAiClient) Embeddings(commandInstance *model.CommandInstance, vector chan<- float32) error {
+	_ := fmt.Sprintf("%s/v1/embeddings	", viper.GetString("openAiUrlPrefix"))
+	return nil
+}*/

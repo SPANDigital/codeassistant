@@ -7,7 +7,7 @@ import (
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/openai"
 	"github.com/spandigitial/codeassistant/client/vertexai"
-	"github.com/spandigitial/codeassistant/model"
+	"github.com/spandigitial/codeassistant/model/prompts"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"os"
@@ -19,7 +19,7 @@ var runPromptsCmd = &cobra.Command{
 	Short: "Run prompts from prompt database",
 	Long:  `Run prompts from prompt database.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		commandInstance, err := model.NewCommandInstance(true, map[string]string{}, args...)
+		commandInstance, err := prompts.NewCommandInstance(true, map[string]string{}, args...)
 		if err == nil {
 			backend := viper.GetString("backend")
 			if backend == "" {

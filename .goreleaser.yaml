@@ -224,7 +224,7 @@ brews:
     # Default: 'bin.install "BinaryName"'
     # install: |
     #  bin.install "some_other_name"
-    #  bash_completion.install "completions/foo.bash" => "foo"
+    #  bash_completion.install "prompts/foo.bash" => "foo"
     #  # ...
 
     # Custom post_install script for brew.
