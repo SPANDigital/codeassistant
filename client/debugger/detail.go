@@ -13,6 +13,7 @@ const (
 	Undefined = iota
 	RequestHeader
 	SentPrompt
+	SentInput
 	RequestPayload
 	ResponseHeader
 	RequestTime
@@ -26,6 +27,7 @@ var (
 	detailName = map[Detail]string{
 		RequestHeader:     "request-header",
 		SentPrompt:        "sent-prompt",
+		SentInput:         "sent-input",
 		RequestPayload:    "request-payload",
 		ResponseHeader:    "response-header",
 		RequestTime:       "request-time",

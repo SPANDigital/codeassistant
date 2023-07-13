@@ -22,9 +22,7 @@ var runPromptsCmd = &cobra.Command{
 		commandInstance, err := prompts.NewCommandInstance(true, map[string]string{}, args...)
 		if err == nil {
 			backend := viper.GetString("backend")
-			if backend == "" {
-				backend = "openai"
-			}
+
 			var llmClient client.LLMClient
 			switch backend {
 			case "openai":

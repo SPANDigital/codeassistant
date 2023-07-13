@@ -5,6 +5,7 @@ package openai
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/debugger"
@@ -245,7 +246,61 @@ func (c *OpenAiClient) Completion(commandInstance *prompts.CommandInstance, mess
 	return nil
 }
 
-/*func (c *OpenAiClient) Embeddings(commandInstance *model.CommandInstance, vector chan<- float32) error {
-	_ := fmt.Sprintf("%s/v1/embeddings	", viper.GetString("openAiUrlPrefix"))
-	return nil
-}*/
+func (c *OpenAiClient) Embeddings(model string, input string) ([]float32, error) {
+	url := fmt.Sprintf("%s/v1/embeddings", viper.GetString("openAiUrlPrefix"))
+	c.debugger.Message(debugger.SentInput, input)
+	request := map[string]string{
+		"model": model,
+		"input": input,
+	}
+
+	requestBytes, err := json.Marshal(request)
+	if err != nil {
+		return nil, err
+	}
+
+	c.debugger.MessageBytes(debugger.RequestPayload, requestBytes)
+
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(requestBytes))
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", *c.userAgent)
+	req.Header.Set("Cache-Control", "no-cache")
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "text/event-stream")
+	req.Header.Set("Connection", "keep-alive")
+	req.Header.Set("Authorization", "Bearer "+c.apiKey)
+
+	requestTime := time.Now()
+	c.debugger.Message(debugger.RequestTime, fmt.Sprintf("%v", requestTime))
+	// Send the HTTP request]
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	firstResponseTime := time.Now()
+	c.debugger.Message(debugger.FirstResponseTime, fmt.Sprintf("%v elapsed %v", firstResponseTime, firstResponseTime.Sub(requestTime)))
+	c.debugger.Message(debugger.LastResponseTime, fmt.Sprintf("%v elapsed %v", firstResponseTime, firstResponseTime.Sub(requestTime)))
+
+	// Read the response body
+	responseBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var response embbedingResponse
+	err = json.Unmarshal(responseBytes, &response)
+	if err != nil {
+		return nil, err
+	}
+
+	if response.Error != nil {
+		return nil, errors.New(response.Error.Message)
+	}
+
+	return response.Data[0].Embedding, nil
+
+}

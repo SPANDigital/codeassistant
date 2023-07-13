@@ -91,9 +91,7 @@ to quickly create a Cobra application.`,
 					return
 				}
 				backend := viper.GetString("backend")
-				if backend == "" {
-					backend = "openai"
-				}
+
 				var llmClient client.LLMClient
 				switch backend {
 				case "openai":

@@ -96,8 +96,6 @@ func (c *Client) Completion(commandInstance *prompts.CommandInstance, messagePar
 		c.location,
 		c.model)
 
-	c.debugger.Message(debugger.RequestTime, fmt.Sprintf("%v", time.Now()))
-
 	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(requestBytes))
 	if err != nil {
 		return err
@@ -108,6 +106,7 @@ func (c *Client) Completion(commandInstance *prompts.CommandInstance, messagePar
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.accessToken))
 
 	requestTime := time.Now()
+	c.debugger.Message(debugger.RequestTime, fmt.Sprintf("%v", requestTime))
 	// Send the HTTP request]
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
@@ -137,4 +136,8 @@ func (c *Client) Completion(commandInstance *prompts.CommandInstance, messagePar
 	messageParts <- client.MessagePart{Delta: "", Type: "Done"}
 	close(messageParts)
 	return nil
+}
+
+func (c *Client) Embeddings(model string, input string) ([]float32, error) {
+	return nil, nil
 }

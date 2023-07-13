@@ -4,22 +4,23 @@ package prompts
 
 import (
 	"errors"
+	"github.com/spandigitial/codeassistant/model/ui"
 )
 
 type Command struct {
-	Library        *Library          `json:"-"`
-	Name           string            `yaml:"-"`
-	DisplayName    string            `yaml:"display-name"`
-	BuiltFromPaths []string          `yaml:"-" json:"-"`
-	Usage          string            `yaml:"usage"`
-	Inherit        string            `yaml:"inherit"`
-	Params         map[string]string `yaml:"params"`
-	UiHints        map[string]UiHint `yaml:"ui-hints"`
-	Prompts        []Prompt          `yaml:"prompts" json:"-"`
-	Abstract       bool              `yaml:"abstract"`
-	OpenAIConfig   OpenAIConfig      `yaml:"open-ai-config"`
-	VertexAIConfig VertexAIConfig    `yaml:"vertex-ai-config"`
-	Script         string            `yaml:"-"`
+	Library        *Library             `json:"-"`
+	Name           string               `yaml:"-"`
+	DisplayName    string               `yaml:"display-name"`
+	BuiltFromPaths []string             `yaml:"-" json:"-"`
+	Usage          string               `yaml:"usage"`
+	Inherit        string               `yaml:"inherit"`
+	Params         map[string]string    `yaml:"params"`
+	UiHints        map[string]ui.UiHint `yaml:"ui-hints"`
+	Prompts        []Prompt             `yaml:"prompts" json:"-"`
+	Abstract       bool                 `yaml:"abstract"`
+	OpenAIConfig   OpenAIConfig         `yaml:"open-ai-config"`
+	VertexAIConfig VertexAIConfig       `yaml:"vertex-ai-config"`
+	Script         string               `yaml:"-"`
 }
 
 func (c *Command) AllPrompts() ([]Prompt, error) {

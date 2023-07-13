@@ -75,8 +75,8 @@ func init() {
 		log.Fatal("Unable to find flag openAiCompletionsModel", err)
 	}
 	rootCmd.PersistentFlags().String("openAiEmbeddingsModel", "text-embedding-ada-002", "Model to use if not specified")
-	if err := viper.BindPFlag("openAiEmbeddingsModel", rootCmd.PersistentFlags().Lookup("openAiCompletionsModel")); err != nil {
-		log.Fatal("Unable to find flag openAiCompletionsModel", err)
+	if err := viper.BindPFlag("openAiEmbeddingsModel", rootCmd.PersistentFlags().Lookup("openAiEmbeddingsModel")); err != nil {
+		log.Fatal("Unable to find flag openAiEmbeddingsModel", err)
 	}
 	rootCmd.PersistentFlags().String("openAiUrlPrefix", "https://api.openai.com", "Prefix of OpenAI Urls")
 	if err := viper.BindPFlag("openAiUrlPrefix", rootCmd.PersistentFlags().Lookup("openAiUrlPrefix")); err != nil {
@@ -114,9 +114,12 @@ func init() {
 		embeddingsLibraryDir = filepath.Join(home, "embeddings-library")
 	}
 	rootCmd.PersistentFlags().String("promptsLibraryDir", promptsLibraryDir, "Prompts library Dir")
-	rootCmd.PersistentFlags().String("embeddingsLibraryDir", embeddingsLibraryDir, "Embedding Library Dir")
 	if err := viper.BindPFlag("promptsLibraryDir", rootCmd.PersistentFlags().Lookup("promptsLibraryDir")); err != nil {
 		log.Fatal("Unable to find flag promptsLibraryDir", err)
+	}
+	rootCmd.PersistentFlags().String("embeddingsLibraryDir", embeddingsLibraryDir, "Embedding Library Dir")
+	if err := viper.BindPFlag("embeddingsLibraryDir", rootCmd.PersistentFlags().Lookup("embeddingsLibraryDir")); err != nil {
+		log.Fatal("Unable to find flag embeddingsLibraryDir", err)
 	}
 	rootCmd.PersistentFlags().String("userAgent", "SPANDigital codeassistant", "HTTP User-Agent")
 	if err := viper.BindPFlag("userAgent", rootCmd.PersistentFlags().Lookup("userAgent")); err != nil {
