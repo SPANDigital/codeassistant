@@ -421,10 +421,8 @@ func (ei *IndexingInstance) Search(llmClient client.LLMClient, content string, q
 	if err != nil {
 		return err
 	}
-	println("Closest related paths")
 	var context string
-	for idx, i := range closest {
-		fmt.Printf("%d: %s\n", idx, i.Content["Path"])
+	for _, i := range closest {
 		context = context + i.Content["Content"].(string) + "###"
 	}
 
