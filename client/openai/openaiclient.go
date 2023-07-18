@@ -118,7 +118,7 @@ func (c *OpenAiClient) Models(models chan<- client.LanguageModel) error {
 }
 
 func (c *OpenAiClient) Completion(commandInstance *prompts.CommandInstance, messageParts chan<- client.MessagePart) error {
-	url := fmt.Sprintf("%s/v1/chat/prompts", viper.GetString("openAiUrlPrefix"))
+	url := fmt.Sprintf("%s/v1/chat/completions", viper.GetString("openAiUrlPrefix"))
 
 	for _, prompt := range commandInstance.Prompts {
 		c.debugger.Message(debugger.SentPrompt, fmt.Sprintf("(%s) %s", prompt.Role, prompt.Content))
