@@ -6,7 +6,8 @@ import (
 	"fmt"
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/debugger"
-	"github.com/spandigitial/codeassistant/model"
+	"github.com/spandigitial/codeassistant/model/prompts"
+	"github.com/spandigitial/codeassistant/vectors"
 	"github.com/spf13/viper"
 	"io"
 	"net/http"
@@ -49,7 +50,7 @@ func (c *Client) Models(models chan<- client.LanguageModel) error {
 	return nil
 }
 
-func (c *Client) Completion(commandInstance *model.CommandInstance, messageParts chan<- client.MessagePart) error {
+func (c *Client) Completion(commandInstance *prompts.CommandInstance, messageParts chan<- client.MessagePart) error {
 
 	temperature := float64(0.2)
 	if commandInstance.Command.VertexAIConfig.Temperature != nil {
@@ -136,5 +137,13 @@ func (c *Client) Completion(commandInstance *model.CommandInstance, messageParts
 	}
 	messageParts <- client.MessagePart{Delta: "", Type: "Done"}
 	close(messageParts)
+	return nil
+}
+
+func (c *Client) Embeddings(model string, input string) (vectors.Vector, error) {
+	return nil, nil
+}
+
+func (c *Client) SimpleCompletion(model string, roleHint string, input string, messageParts chan<- client.MessagePart) error {
 	return nil
 }
