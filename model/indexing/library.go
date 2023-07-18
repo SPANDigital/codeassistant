@@ -1,6 +1,4 @@
-// SPDX-License-Identifier: MIT
-
-package model
+package indexing
 
 import (
 	"path/filepath"
@@ -15,23 +13,23 @@ type Library struct {
 	BuiltFromPaths []string `json:"-"`
 	Index          string
 	Data           map[string]interface{} `yaml:"-" json:"-"'`
-	Commands       map[string]*Command
+	Embeddings     map[string]*Indexing
 }
 
 func (l *Library) addBuildPath(path string) {
 	l.BuiltFromPaths = append(l.BuiltFromPaths, filepath.Base(path))
 }
 
-func (l *Library) getCommand(path string) *Command {
+func (l *Library) getEmbedding(path string) *Indexing {
 	base := filepath.Base(path)
 	frontName := strings.Split(base, ".")[0]
-	command, found := l.Commands[frontName]
+	command, found := l.Embeddings[frontName]
 	if !found {
-		command = &Command{
+		command = &Indexing{
 			Name:    frontName,
 			Library: l,
 		}
-		l.Commands[frontName] = command
+		l.Embeddings[frontName] = command
 	}
 	command.BuiltFromPaths = append(command.BuiltFromPaths, base)
 	return command

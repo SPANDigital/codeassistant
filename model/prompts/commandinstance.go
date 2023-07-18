@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-package model
+package prompts
 
 import (
 	"bytes"
@@ -65,8 +65,8 @@ func (ci *CommandInstance) runParamTemplate(input string) (string, error) {
 	return buff.String(), nil
 }
 
-func (ci *CommandInstance) runContentTemplate(content string) (string, error) {
-	tmpl, err := template.New("runContentTemplate").Funcs(sprig.FuncMap()).Parse(content)
+func (ci *CommandInstance) runTemplate(content string) (string, error) {
+	tmpl, err := template.New("runTemplate").Funcs(sprig.FuncMap()).Parse(content)
 	if err != nil {
 		return "", err
 	}
@@ -107,8 +107,8 @@ func (ci *CommandInstance) buildPrompts() ([]Prompt, error) {
 		return nil, err
 	}
 	for _, prompt := range allPrompts {
-		role, err := ci.runContentTemplate(prompt.Role)
-		content, err := ci.runContentTemplate(prompt.Content)
+		role, err := ci.runTemplate(prompt.Role)
+		content, err := ci.runTemplate(prompt.Content)
 		if err != nil {
 			return nil, err
 		}
@@ -119,14 +119,6 @@ func (ci *CommandInstance) buildPrompts() ([]Prompt, error) {
 
 	}
 	return prompts, nil
-}
-
-func stringArguments(call *otto.FunctionCall) []string {
-	ret := make([]string, len(call.ArgumentList))
-	for _, argument := range call.ArgumentList {
-		ret = append(ret, argument.String())
-	}
-	return ret
 }
 
 func (ci *CommandInstance) runScript() error {

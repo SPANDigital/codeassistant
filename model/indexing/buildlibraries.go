@@ -1,6 +1,4 @@
-// SPDX-License-Identifier: MIT
-
-package model
+package indexing
 
 import (
 	"github.com/spf13/viper"
@@ -12,16 +10,13 @@ import (
 )
 
 func BuildLibraries() map[string]*Library {
-
 	libraries := make(map[string]*Library)
-
-	promptsLibrary := viper.GetString("promptsLibraryDir")
-	if promptsLibrary == "" {
+	embeddingsLibrary := viper.GetString("indexingLibraryDir")
+	if embeddingsLibrary == "" {
 		return libraries
 	}
-
 	libraryFromDir := func(path string) *Library {
-		relPath, err := filepath.Rel(promptsLibrary, path)
+		relPath, err := filepath.Rel(embeddingsLibrary, path)
 		if err != nil {
 			return nil
 		}
@@ -33,18 +28,17 @@ func BuildLibraries() map[string]*Library {
 			return library
 		} else {
 			library := &Library{
-				Name:     relPath,
-				Path:     path,
-				Index:    "",
-				Commands: make(map[string]*Command),
+				Name:       relPath,
+				Path:       path,
+				Index:      "",
+				Embeddings: make(map[string]*Indexing),
 			}
 			libraries[relPath] = library
 			return library
 		}
-
 	}
 
-	_ = filepath.WalkDir(promptsLibrary, func(path string, d fs.DirEntry, err error) error {
+	_ = filepath.WalkDir(embeddingsLibrary, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
@@ -79,17 +73,17 @@ func BuildLibraries() map[string]*Library {
 						}
 						return err
 					} else if ext == ".yaml" || ext == ".yml" {
-						command := library.getCommand(path)
-						err := yaml.Unmarshal(data, &command)
+						embedding := library.getEmbedding(path)
+						err := yaml.Unmarshal(data, &embedding)
 						if err != nil {
 							return err
 						}
-						if command.DisplayName == "" {
-							command.DisplayName = strings.ReplaceAll(command.Name, "-", " ")
+						if embedding.DisplayName == "" {
+							embedding.DisplayName = strings.ReplaceAll(embedding.Name, "-", " ")
 						}
 					} else if ext == ".js" {
-						command := library.getCommand(path)
-						command.Script = string(data)
+						embedding := library.getEmbedding(path)
+						embedding.Script = string(data)
 					}
 				}
 			}

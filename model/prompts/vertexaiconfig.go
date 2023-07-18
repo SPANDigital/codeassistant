@@ -1,4 +1,4 @@
-package model
+package prompts
 
 type VertexAIConfig struct {
 	Model           string   `yaml:"model"`

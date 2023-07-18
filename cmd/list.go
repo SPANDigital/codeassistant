@@ -4,7 +4,7 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spandigitial/codeassistant/model"
+	"github.com/spandigitial/codeassistant/model/prompts"
 	"github.com/spf13/cobra"
 )
 
@@ -14,7 +14,7 @@ var listPromptsCmd = &cobra.Command{
 	Short: "List prompts from prompt database",
 	Long:  `List prompts from prompt database.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		for _, library := range model.BuildLibraries() {
+		for _, library := range prompts.BuildLibraries() {
 			for _, command := range library.Commands {
 				if !command.Abstract {
 					params := ""

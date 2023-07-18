@@ -70,9 +70,13 @@ func init() {
 	if err := viper.BindPFlag("openAiUserId", rootCmd.PersistentFlags().Lookup("openAiUserId")); err != nil {
 		log.Fatal("Unable to find flag userEmail", err)
 	}
-	rootCmd.PersistentFlags().String("openAiModel", "gpt-4", "Model to use if not specified")
-	if err := viper.BindPFlag("openAiModel", rootCmd.PersistentFlags().Lookup("openAiModel")); err != nil {
-		log.Fatal("Unable to find flag openAiModel", err)
+	rootCmd.PersistentFlags().String("openAiCompletionsModel", "gpt-4", "Model to use if not specified")
+	if err := viper.BindPFlag("openAiCompletionsModel", rootCmd.PersistentFlags().Lookup("openAiCompletionsModel")); err != nil {
+		log.Fatal("Unable to find flag openAiCompletionsModel", err)
+	}
+	rootCmd.PersistentFlags().String("openAiEmbeddingsModel", "text-embedding-ada-002", "Model to use if not specified")
+	if err := viper.BindPFlag("openAiEmbeddingsModel", rootCmd.PersistentFlags().Lookup("openAiEmbeddingsModel")); err != nil {
+		log.Fatal("Unable to find flag openAiEmbeddingsModel", err)
 	}
 	rootCmd.PersistentFlags().String("openAiUrlPrefix", "https://api.openai.com", "Prefix of OpenAI Urls")
 	if err := viper.BindPFlag("openAiUrlPrefix", rootCmd.PersistentFlags().Lookup("openAiUrlPrefix")); err != nil {
@@ -94,19 +98,28 @@ func init() {
 	if err := viper.BindPFlag("vertexAiModel", rootCmd.PersistentFlags().Lookup("vertexAiModel")); err != nil {
 		log.Fatal("Unable to find flag vertexAiModel", err)
 	}
+	rootCmd.PersistentFlags().String("vertexAiPromptAttribute", "content", "Model to use if not specified")
+	if err := viper.BindPFlag("vertexAiPromptAttribute", rootCmd.PersistentFlags().Lookup("vertexAiPromptAttribute")); err != nil {
+		log.Fatal("Unable to find flag vertexAiModel", err)
+	}
 	rootCmd.PersistentFlags().String("vertexAiLocation", "us-central1", "Locstion to use if not specified")
 	if err := viper.BindPFlag("vertexAiLocation", rootCmd.PersistentFlags().Lookup("vertexAiLocation")); err != nil {
 		log.Fatal("Unable to find flag vertexAiLocation", err)
 	}
 	// Find home directory.
-	promptsLibraryDir := ""
+	promptsLibraryDir, indexingLibraryDir := "", ""
 	home, err := os.UserHomeDir()
 	if err == nil {
 		promptsLibraryDir = filepath.Join(home, "prompts-library")
+		indexingLibraryDir = filepath.Join(home, "embeddings-library")
 	}
 	rootCmd.PersistentFlags().String("promptsLibraryDir", promptsLibraryDir, "Prompts library Dir")
 	if err := viper.BindPFlag("promptsLibraryDir", rootCmd.PersistentFlags().Lookup("promptsLibraryDir")); err != nil {
 		log.Fatal("Unable to find flag promptsLibraryDir", err)
+	}
+	rootCmd.PersistentFlags().String("indexingLibraryDir", indexingLibraryDir, "Indexing Library Dir")
+	if err := viper.BindPFlag("indexingLibraryDir", rootCmd.PersistentFlags().Lookup("indexingLibraryDir")); err != nil {
+		log.Fatal("Unable to find flag indexingLibraryDir", err)
 	}
 	rootCmd.PersistentFlags().String("userAgent", "SPANDigital codeassistant", "HTTP User-Agent")
 	if err := viper.BindPFlag("userAgent", rootCmd.PersistentFlags().Lookup("userAgent")); err != nil {

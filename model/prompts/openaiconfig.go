@@ -1,4 +1,4 @@
-package model
+package prompts
 
 type OpenAIConfig struct {
 	Model       string   `yaml:"model"`
