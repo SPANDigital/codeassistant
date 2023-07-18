@@ -7,6 +7,7 @@ import (
 	"github.com/spandigitial/codeassistant/client"
 	"github.com/spandigitial/codeassistant/client/debugger"
 	"github.com/spandigitial/codeassistant/model/prompts"
+	"github.com/spandigitial/codeassistant/vectors"
 	"github.com/spf13/viper"
 	"io"
 	"net/http"
@@ -138,6 +139,10 @@ func (c *Client) Completion(commandInstance *prompts.CommandInstance, messagePar
 	return nil
 }
 
-func (c *Client) Embeddings(model string, input string) ([]float32, error) {
+func (c *Client) Embeddings(model string, input string) (vectors.Vector, error) {
 	return nil, nil
+}
+
+func (c *Client) SimpleCompletion(model string, roleHint string, input string, messageParts chan<- client.MessagePart) error {
+	return nil
 }

@@ -1,4 +1,4 @@
-package embeddings
+package indexing
 
 import (
 	"path/filepath"
@@ -13,19 +13,19 @@ type Library struct {
 	BuiltFromPaths []string `json:"-"`
 	Index          string
 	Data           map[string]interface{} `yaml:"-" json:"-"'`
-	Embeddings     map[string]*Embedding
+	Embeddings     map[string]*Indexing
 }
 
 func (l *Library) addBuildPath(path string) {
 	l.BuiltFromPaths = append(l.BuiltFromPaths, filepath.Base(path))
 }
 
-func (l *Library) getEmbedding(path string) *Embedding {
+func (l *Library) getEmbedding(path string) *Indexing {
 	base := filepath.Base(path)
 	frontName := strings.Split(base, ".")[0]
 	command, found := l.Embeddings[frontName]
 	if !found {
-		command = &Embedding{
+		command = &Indexing{
 			Name:    frontName,
 			Library: l,
 		}

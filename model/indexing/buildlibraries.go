@@ -1,4 +1,4 @@
-package embeddings
+package indexing
 
 import (
 	"github.com/spf13/viper"
@@ -11,7 +11,7 @@ import (
 
 func BuildLibraries() map[string]*Library {
 	libraries := make(map[string]*Library)
-	embeddingsLibrary := viper.GetString("embeddingsLibraryDir")
+	embeddingsLibrary := viper.GetString("indexingLibraryDir")
 	if embeddingsLibrary == "" {
 		return libraries
 	}
@@ -31,7 +31,7 @@ func BuildLibraries() map[string]*Library {
 				Name:       relPath,
 				Path:       path,
 				Index:      "",
-				Embeddings: make(map[string]*Embedding),
+				Embeddings: make(map[string]*Indexing),
 			}
 			libraries[relPath] = library
 			return library

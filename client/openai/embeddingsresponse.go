@@ -2,7 +2,7 @@ package openai
 
 type embbedingResponse struct {
 	Data []struct {
-		Embedding []float32 `json:"embedding"`
+		Embedding []float64 `json:"embedding"`
 		Index     int       `json:"index"`
 		Object    string    `json:"object"`
 	} `json:"data"`

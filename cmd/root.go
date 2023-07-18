@@ -107,19 +107,19 @@ func init() {
 		log.Fatal("Unable to find flag vertexAiLocation", err)
 	}
 	// Find home directory.
-	promptsLibraryDir, embeddingsLibraryDir := "", ""
+	promptsLibraryDir, indexingLibraryDir := "", ""
 	home, err := os.UserHomeDir()
 	if err == nil {
 		promptsLibraryDir = filepath.Join(home, "prompts-library")
-		embeddingsLibraryDir = filepath.Join(home, "embeddings-library")
+		indexingLibraryDir = filepath.Join(home, "embeddings-library")
 	}
 	rootCmd.PersistentFlags().String("promptsLibraryDir", promptsLibraryDir, "Prompts library Dir")
 	if err := viper.BindPFlag("promptsLibraryDir", rootCmd.PersistentFlags().Lookup("promptsLibraryDir")); err != nil {
 		log.Fatal("Unable to find flag promptsLibraryDir", err)
 	}
-	rootCmd.PersistentFlags().String("embeddingsLibraryDir", embeddingsLibraryDir, "Embedding Library Dir")
-	if err := viper.BindPFlag("embeddingsLibraryDir", rootCmd.PersistentFlags().Lookup("embeddingsLibraryDir")); err != nil {
-		log.Fatal("Unable to find flag embeddingsLibraryDir", err)
+	rootCmd.PersistentFlags().String("indexingLibraryDir", indexingLibraryDir, "Indexing Library Dir")
+	if err := viper.BindPFlag("indexingLibraryDir", rootCmd.PersistentFlags().Lookup("indexingLibraryDir")); err != nil {
+		log.Fatal("Unable to find flag indexingLibraryDir", err)
 	}
 	rootCmd.PersistentFlags().String("userAgent", "SPANDigital codeassistant", "HTTP User-Agent")
 	if err := viper.BindPFlag("userAgent", rootCmd.PersistentFlags().Lookup("userAgent")); err != nil {
