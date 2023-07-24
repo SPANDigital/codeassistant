@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-git/go-git/v5 v5.7.0
+	github.com/go-git/go-git/v5 v5.8.0
 	github.com/google/uuid v1.3.0
 	github.com/robertkrimen/otto v0.2.1
 	github.com/spf13/cobra v1.7.0
@@ -13,6 +13,7 @@ require (
 	github.com/yargevad/filepathx v1.0.0
 	golang.org/x/time v0.3.0
 	gopkg.in/yaml.v3 v3.0.1
+	modernc.org/sqlite v1.24.0
 )
 
 require (
@@ -85,7 +86,6 @@ require (
 	modernc.org/mathutil v1.5.0 // indirect
 	modernc.org/memory v1.5.0 // indirect
 	modernc.org/opt v0.1.3 // indirect
-	modernc.org/sqlite v1.24.0 // indirect
 	modernc.org/strutil v1.1.3 // indirect
 	modernc.org/token v1.0.1 // indirect
 )
